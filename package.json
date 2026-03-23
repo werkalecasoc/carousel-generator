@@ -1,0 +1,19 @@
+{
+  "name": "carousel-generator",
+  "version": "1.0.0",
+  "description": "Generador de carruseles con Nano Banana (Gemini Image Generation)",
+  "type": "module",
+  "main": "src/index.mjs",
+  "scripts": {
+    "start": "node server.mjs",
+    "generate": "node src/index.mjs",
+    "example": "node src/index.mjs --config config/ejemplo.json"
+  },
+  "dependencies": {
+    "@google/genai": "^1.0.1",
+    "archiver": "^7.0.1",
+    "dotenv": "^16.0.0",
+    "express": "^5.2.1",
+    "multer": "^2.1.1"
+  }
+}

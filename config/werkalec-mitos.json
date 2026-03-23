@@ -1,0 +1,95 @@
+{
+  "tema": "7 mitos de WhatsApp que le cuestan dinero a los inmobiliarios",
+  "cantidadSlides": 9,
+  "tono": "educativo e inspiracional",
+  "audiencia": "dueños de inmobiliarias y equipos con más de 20 contactos diarios",
+  "estiloPortada": "./refs/portada.png",
+  "estiloInterior": "./refs/interior.png",
+  "tipografiaTitulos": "Cormorant Garamond",
+  "tipografiaSubtitulos": "Plus Jakarta Sans",
+  "paleta": ["#341600", "#c7a278", "#ffbd59", "#FFF8F0"],
+  "modelo": "gemini-3.1-flash-image-preview",
+  "slides": [
+    {
+      "numero": 1,
+      "tipo": "portada",
+      "layout": "portada",
+      "titulo": "Si sos inmobiliario y WhatsApp es tu ÚNICA herramienta de negocio...",
+      "subtitulo": "Estos 7 MITOS te están costando dinero",
+      "texto": null,
+      "ctaTexto": "SWIPE →"
+    },
+    {
+      "numero": 2,
+      "tipo": "contenido",
+      "layout": "mito-verdad",
+      "titulo": "MITO #1",
+      "subtitulo": "\"WhatsApp es gratis = no cuesta nada\"",
+      "texto": "VERDAD: WhatsApp sin sistema cuesta dinero en tiempo y en contactos perdidos",
+      "ctaTexto": "SWIPE →"
+    },
+    {
+      "numero": 3,
+      "tipo": "contenido",
+      "layout": "mito-verdad",
+      "titulo": "MITO #2",
+      "subtitulo": "\"Si contesto rápido, el cliente no se va\"",
+      "texto": "VERDAD: Sin seguimiento, el 67% de los contactos se pierden igual",
+      "ctaTexto": "SWIPE →"
+    },
+    {
+      "numero": 4,
+      "tipo": "contenido",
+      "layout": "mito-verdad",
+      "titulo": "MITO #3",
+      "subtitulo": "\"Puedo gestionar todo desde WhatsApp sin problema\"",
+      "texto": "VERDAD: Sin un SISTEMA, los mensajes se pierden en el caos",
+      "ctaTexto": "SWIPE →"
+    },
+    {
+      "numero": 5,
+      "tipo": "contenido",
+      "layout": "mito-verdad",
+      "titulo": "MITO #4",
+      "subtitulo": "\"Mi equipo sabe exactamente a quién contactó\"",
+      "texto": "VERDAD: Sin sistema centralizado, hay duplicación, mensajes perdidos, contactos olvidados",
+      "ctaTexto": "SWIPE →"
+    },
+    {
+      "numero": 6,
+      "tipo": "contenido",
+      "layout": "mito-verdad",
+      "titulo": "MITO #5",
+      "subtitulo": "\"El seguimiento es opcional\"",
+      "texto": "VERDAD: El 83% de las ventas de inmuebles necesitan un mínimo de 5+ seguimientos",
+      "ctaTexto": "SWIPE →"
+    },
+    {
+      "numero": 7,
+      "tipo": "contenido",
+      "layout": "mito-verdad",
+      "titulo": "MITO #6",
+      "subtitulo": "\"Si es importante, el cliente volverá a escribir\"",
+      "texto": "VERDAD: El 73% de compradores elige al primer inmobiliario que responde",
+      "ctaTexto": "SWIPE →"
+    },
+    {
+      "numero": 8,
+      "tipo": "contenido",
+      "layout": "mito-verdad",
+      "titulo": "MITO #7",
+      "subtitulo": "\"Trabajar más horas compensa la falta de sistema\"",
+      "texto": "VERDAD: Sin sistema, trabajás más y vendés menos",
+      "ctaTexto": "SWIPE →"
+    },
+    {
+      "numero": 9,
+      "tipo": "cta",
+      "layout": "solo-tipografia",
+      "titulo": "¿Cuál de estos mitos te llamó más la atención?",
+      "subtitulo": "Contanos en los comentarios 👇",
+      "texto": "Guardá este post para no olvidarlo — y compartilo con tu equipo.",
+      "ctaTexto": "COMENTAR →"
+    }
+  ]
+}

@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de Carruseles IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary:    #1E293B;
+    --accent:     #3B6FE8;
+    --accent-h:   #2D5FD4;
+    --success:    #22C55E;
+    --danger:     #EF4444;
+    --warn:       #F59E0B;
+    --bg:         #FFFFFF;
+    --bg-soft:    #F7F9FC;
+    --bg-card:    #FFFFFF;
+    --border:     #E2E8F0;
+    --border-h:   #3B6FE8;
+    --text:       #1E293B;
+    --text-soft:  #64748B;
+    --text-light: #94A3B8;
+    --radius:     12px;
+    --radius-pill: 50px;
+    --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow:     0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
+    --shadow-lg:  0 10px 30px rgba(0,0,0,.1), 0 4px 10px rgba(0,0,0,.06);
+  }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg-soft);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, .heading { font-family: 'Raleway', sans-serif; }
+
+  /* ── PAGE HERO ── */
+  .page-hero {
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 36px 48px 32px;
+    text-align: center;
+  }
+  .page-hero .badge {
+    display: inline-block;
+    background: #EEF2FF;
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: var(--radius-pill);
+    margin-bottom: 14px;
+  }
+  .page-hero h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 8px;
+    letter-spacing: -.02em;
+  }
+  .page-hero p {
+    color: var(--text-soft);
+    font-size: 14px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* ── STEPS ── */
+  .steps-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0;
+  }
+  .step-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-bottom: 2px solid transparent;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-light);
+    cursor: default;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .step-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .step-tab.done { color: var(--success); }
+  .step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--bg-soft);
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    transition: all .2s;
+  }
+  .step-tab.active .step-num { background: var(--accent); border-color: var(--accent); color: white; }
+  .step-tab.done .step-num { background: var(--success); border-color: var(--success); color: white; }
+
+  /* ── LAYOUT ── */
+  .page-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .main-layout {
+    display: grid;
+    grid-template-columns: 440px 1fr;
+    min-height: calc(100vh - 160px);
+    padding: 32px;
+    gap: 24px;
+    align-items: start;
+  }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-header .icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: #EEF2FF;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+  }
+  .card-header h3 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .card-header p {
+    font-size: 11px;
+    color: var(--text-light);
+    margin-top: 1px;
+  }
+  .card-body { padding: 20px; }
+
+  /* ── SECTION LABEL ── */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-light);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* ── FIELDS ── */
+  .field { margin-bottom: 14px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-soft);
+    margin-bottom: 5px;
+  }
+  .field input, .field textarea, .field select {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(59,111,232,.1);
+  }
+  .field textarea { resize: vertical; min-height: 90px; }
+  .field select { cursor: pointer; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* ── REFS ── */
+  .refs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .ref-slot {
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    padding: 14px 12px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    transition: border-color .15s, background .15s;
+    min-height: 90px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  }
+  .ref-slot:hover { border-color: var(--accent); background: #F5F8FF; }
+  .ref-slot.has-image { border-style: solid; border-color: var(--success); background: #F0FDF4; }
+  .ref-slot input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .ref-slot img { width: 100%; height: 70px; object-fit: cover; border-radius: 6px; margin-bottom: 4px; }
+  .ref-slot .ref-name { font-size: 11px; font-weight: 600; color: var(--text-soft); }
+  .ref-slot .ref-hint { font-size: 10px; color: var(--text-light); }
+  .ref-slot .ref-ok { font-size: 10px; color: var(--success); font-weight: 600; }
+
+  /* ── PALETTE ── */
+  .palette-list { display: flex; flex-direction: column; gap: 8px; }
+  .palette-row { display: flex; align-items: center; gap: 8px; }
+  .color-swatch {
+    width: 36px; height: 36px; border-radius: 8px;
+    border: 2px solid var(--border); cursor: pointer; flex-shrink: 0;
+    transition: transform .15s;
+  }
+  .color-swatch:hover { transform: scale(1.08); }
+  .palette-row input[type=text] {
+    flex: 1;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text);
+    outline: none;
+  }
+  .palette-row input[type=text]:focus { border-color: var(--accent); }
+
+  /* ── COLLAPSIBLE ── */
+  .collapsible-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px;
+    background: var(--bg-soft);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-soft);
+    transition: background .15s, border-color .15s;
+    user-select: none;
+  }
+  .collapsible-header:hover { border-color: var(--accent); color: var(--accent); }
+  .collapsible-header .chevron { font-size: 10px; transition: transform .2s; }
+  .collapsible-header.open .chevron { transform: rotate(180deg); }
+  .collapsible-body { display: none; margin-top: 10px; }
+  .collapsible-body.open { display: block; }
+
+  /* ── PARSE BUTTON ── */
+  .btn-parse {
+    width: 100%;
+    background: #EEF2FF;
+    color: var(--accent);
+    border: 1.5px solid #C7D7FD;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+    margin-top: 6px;
+  }
+  .btn-parse:hover { background: #E0E7FF; border-color: var(--accent); }
+  .btn-parse:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ── SLIDES MANUALES ── */
+  .slide-item {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 8px;
+    background: var(--bg);
+    position: relative;
+  }
+  .slide-item .slide-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .slide-item .slide-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--accent);
+  }
+  .slide-item .btn-remove {
+    background: none; border: none; color: var(--text-light);
+    font-size: 16px; cursor: pointer; line-height: 1;
+    padding: 0 2px;
+  }
+  .slide-item .btn-remove:hover { color: var(--danger); }
+  .slide-item input, .slide-item textarea, .slide-item select {
+    width: 100%; margin-bottom: 6px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 12px;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .slide-item input:focus, .slide-item textarea:focus, .slide-item select:focus {
+    border-color: var(--accent);
+  }
+  .slide-item textarea { min-height: 50px; resize: vertical; }
+  .slide-item .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  .btn-add-slide {
+    width: 100%;
+    background: none;
+    border: 1.5px dashed var(--border);
+    border-radius: 8px;
+    padding: 9px;
+    font-size: 12px;
+    color: var(--text-light);
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color .15s, color .15s;
+    margin-top: 4px;
+  }
+  .btn-add-slide:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── GENERATE BUTTON ── */
+  .btn-generate {
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Raleway', sans-serif;
+    letter-spacing: .02em;
+    cursor: pointer;
+    transition: background .2s, transform .1s, box-shadow .2s;
+    box-shadow: 0 4px 12px rgba(30,41,59,.2);
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 8px;
+  }
+  .btn-generate:hover { background: var(--accent); box-shadow: 0 6px 16px rgba(59,111,232,.3); }
+  .btn-generate:active { transform: scale(.98); }
+  .btn-generate:disabled { background: var(--text-light); box-shadow: none; cursor: not-allowed; }
+
+  /* ── PANEL DERECHO ── */
+  .panel-right { display: flex; flex-direction: column; gap: 20px; }
+
+  .empty-state {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 64px 40px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+  }
+  .empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 6px; }
+  .empty-state p { color: var(--text-light); font-size: 13px; }
+
+  /* ── PROGRESS ── */
+  .progress-card { display: none; }
+  .progress-card.visible { display: block; }
+  .progress-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .progress-header h3 { font-size: 14px; font-weight: 700; color: var(--primary); }
+  .progress-pct { font-size: 13px; font-weight: 600; color: var(--accent); }
+  .progress-track {
+    height: 6px;
+    background: var(--bg-soft);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 14px;
+    border: 1px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #7C3AED);
+    border-radius: 100px;
+    width: 0%;
+    transition: width .5s ease;
+  }
+  .log-scroll {
+    background: #F8FAFC;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    max-height: 160px;
+    overflow-y: auto;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11.5px;
+    line-height: 1.8;
+    color: var(--text-soft);
+  }
+  .log-scroll .log-ok  { color: var(--success); }
+  .log-scroll .log-err { color: var(--danger); }
+  .log-scroll .log-dim { color: var(--text-light); }
+
+  /* ── SLIDES GRID ── */
+  .slides-output { display: none; }
+  .result-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .result-header h3 { font-size: 14px; font-weight: 700; color: var(--primary); }
+  .result-header .count {
+    font-size: 11px; font-weight: 600; color: var(--text-light);
+    background: var(--bg-soft); padding: 3px 10px; border-radius: 100px;
+    border: 1px solid var(--border);
+  }
+  .slides-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .slide-card {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    background: var(--bg-card);
+    position: relative;
+    animation: popIn .4s cubic-bezier(.34,1.56,.64,1);
+    cursor: pointer;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .slide-card:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(.9) translateY(6px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .slide-card img { width: 100%; display: block; }
+  .slide-card .slide-footer {
+    padding: 8px 10px;
+    font-size: 10px;
+    color: var(--text-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-top: 1px solid var(--border);
+  }
+  .slide-badge {
+    position: absolute;
+    top: 6px; left: 6px;
+    background: rgba(255,255,255,.9);
+    color: var(--accent);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 100px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(59,111,232,.2);
+  }
+
+  /* ── CAPTION ── */
+  .caption-output { display: none; }
+  .caption-body {
+    background: #F8FAFC;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    white-space: pre-wrap;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text);
+    position: relative;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  .btn-copy {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-pill);
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: border-color .15s, color .15s;
+  }
+  .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── DOWNLOAD ── */
+  .btn-download {
+    display: none;
+    width: 100%;
+    align-items: center; justify-content: center; gap: 10px;
+    background: var(--success);
+    color: white;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Raleway', sans-serif;
+    letter-spacing: .02em;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(34,197,94,.25);
+    transition: background .2s, transform .1s, box-shadow .2s;
+    text-decoration: none;
+  }
+  .btn-download.visible { display: flex; }
+  .btn-download:hover { background: #16A34A; box-shadow: 0 6px 16px rgba(34,197,94,.35); }
+  .btn-download:active { transform: scale(.98); }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 12px; box-shadow: var(--shadow-lg); }
+  .lightbox-close {
+    position: fixed; top: 20px; right: 24px;
+    background: rgba(255,255,255,.15);
+    border: none; color: white; font-size: 24px;
+    cursor: pointer; border-radius: 50%;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .lightbox-close:hover { background: rgba(255,255,255,.25); }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+<!-- Hero -->
+<div class="page-hero">
+  <div class="badge">✦ Powered by IA</div>
+  <h1>Generador de Carruseles</h1>
+  <p>Creá carruseles profesionales para Instagram en minutos. Solo definí el contenido y la IA hace el resto.</p>
+</div>
+
+<!-- Steps -->
+<div class="steps-bar">
+  <div class="step-tab active" id="step-1"><div class="step-num">1</div> Estilo & Referencias</div>
+  <div class="step-tab" id="step-2"><div class="step-num">2</div> Contenido</div>
+  <div class="step-tab" id="step-3"><div class="step-num">3</div> Configuración</div>
+  <div class="step-tab" id="step-4"><div class="step-num">4</div> Resultado</div>
+</div>
+
+<!-- Layout principal -->
+<div class="main-layout" id="main-layout">
+
+  <!-- ─── PANEL IZQUIERDO ─── -->
+  <div class="panel-left">
+
+    <!-- 1. Referencias -->
+    <div class="card">
+      <div class="card-header">
+        <div class="icon">🖼️</div>
+        <div>
+          <h3>Imágenes de referencia de estilo</h3>
+          <p>Portada + interior — si no cambiás, se reusan las anteriores</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="refs-grid">
+          <div class="ref-slot" id="slot-portada">
+            <input type="file" accept="image/*" onchange="uploadRef('portada', this)">
+            <div id="portada-preview">
+              <div style="font-size:24px;margin-bottom:4px">＋</div>
+              <div class="ref-name">Portada</div>
+              <div class="ref-hint">Clic o arrastrar</div>
+            </div>
+          </div>
+          <div class="ref-slot" id="slot-interior">
+            <input type="file" accept="image/*" onchange="uploadRef('interior', this)">
+            <div id="interior-preview">
+              <div style="font-size:24px;margin-bottom:4px">＋</div>
+              <div class="ref-name">Interior</div>
+              <div class="ref-hint">Clic o arrastrar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Contenido -->
+    <div class="card">
+      <div class="card-header">
+        <div class="icon">✍️</div>
+        <div>
+          <h3>Contenido del carrusel</h3>
+          <p>Pegá tu texto o dejá que la IA lo genere</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="field">
+          <label>Tema <span style="color:var(--danger)">*</span></label>
+          <input type="text" id="tema" placeholder="ej: 7 mitos de WhatsApp para inmobiliarios">
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label>Tono</label>
+            <select id="tono">
+              <option>educativo</option>
+              <option>inspiracional</option>
+              <option selected>educativo e inspiracional</option>
+              <option>comercial</option>
+              <option>provocador</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Cantidad de slides</label>
+            <input type="number" id="cantidadSlides" value="7" min="3" max="20">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Audiencia</label>
+          <input type="text" id="audiencia" placeholder="ej: dueños de inmobiliarias">
+        </div>
+
+        <!-- Pegar contenido libre -->
+        <div style="margin-top:4px">
+          <div class="collapsible-header" onclick="toggleSection('paste-section', this)">
+            <span>✨ &nbsp;Pegar contenido completo para estructurar con IA</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="collapsible-body" id="paste-section">
+            <div class="field" style="margin-top:10px">
+              <label>Pegá el contenido de tus slides (en lenguaje libre)</label>
+              <textarea id="contenido-libre" placeholder="Ej:&#10;Slide 1 - Hook: ¿Tu equipo pierde contactos?&#10;Slide 2 - Mito: WhatsApp es gratis...&#10;Slide 3 - ..." style="min-height:110px"></textarea>
+            </div>
+            <button class="btn-parse" id="btn-parse" onclick="parseContenido()">
+              ✨ &nbsp;Estructurar en slides automáticamente
+            </button>
+          </div>
+        </div>
+
+        <!-- Slides manuales -->
+        <div style="margin-top:10px">
+          <div class="collapsible-header" onclick="toggleSection('slides-section', this)">
+            <span>📋 &nbsp;Editar slides manualmente</span>
+            <span class="chevron">▼</span>
+          </div>
+          <div class="collapsible-body" id="slides-section">
+            <div id="slides-list" style="margin-top:10px"></div>
+            <button class="btn-add-slide" onclick="addSlide()">＋ &nbsp;Agregar slide</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Configuración -->
+    <div class="card">
+      <div class="card-header">
+        <div class="icon">⚙️</div>
+        <div>
+          <h3>Tipografía & Paleta</h3>
+          <p>Estilo visual del carrusel</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row-2">
+          <div class="field">
+            <label>Fuente títulos</label>
+            <input type="text" id="tipografiaTitulos" value="Raleway" placeholder="ej: Raleway">
+          </div>
+          <div class="field">
+            <label>Fuente cuerpo</label>
+            <input type="text" id="tipografiaSubtitulos" value="Poppins" placeholder="ej: Poppins">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Paleta de colores</label>
+          <div class="palette-list" id="palette-fields">
+            <div class="palette-row">
+              <input type="color" class="color-swatch" value="#1E293B" oninput="syncText(this)">
+              <input type="text" value="#1E293B" oninput="syncChip(this)" placeholder="#000000">
+            </div>
+            <div class="palette-row">
+              <input type="color" class="color-swatch" value="#c7a278" oninput="syncText(this)">
+              <input type="text" value="#c7a278" oninput="syncChip(this)" placeholder="#000000">
+            </div>
+            <div class="palette-row">
+              <input type="color" class="color-swatch" value="#ffbd59" oninput="syncText(this)">
+              <input type="text" value="#ffbd59" oninput="syncChip(this)" placeholder="#000000">
+            </div>
+            <div class="palette-row">
+              <input type="color" class="color-swatch" value="#FFF8F0" oninput="syncText(this)">
+              <input type="text" value="#FFF8F0" oninput="syncChip(this)" placeholder="#000000">
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Modelo de generación</label>
+          <select id="modelo">
+            <option value="gemini-2.5-flash-image">Estándar — más económico</option>
+            <option value="gemini-3.1-flash-image-preview" selected>Avanzado — mejor calidad ✓</option>
+            <option value="gemini-3-pro-image-preview">Pro — máxima calidad</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón generar -->
+    <button class="btn-generate" id="btn-generate" onclick="generate()">
+      <span>Generar carrusel</span>
+      <span>→</span>
+    </button>
+
+  </div>
+
+  <!-- ─── PANEL DERECHO ─── -->
+  <div class="panel-right">
+
+    <!-- Estado vacío -->
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">✦</div>
+      <h3>Tu carrusel aparecerá acá</h3>
+      <p>Completá el formulario y hacé clic en "Generar carrusel"</p>
+    </div>
+
+    <!-- Progreso -->
+    <div class="card progress-card" id="progress-card">
+      <div class="card-body">
+        <div class="progress-header">
+          <h3>Generando carrusel...</h3>
+          <span class="progress-pct" id="progress-pct">0%</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="log-scroll" id="log-box"></div>
+      </div>
+    </div>
+
+    <!-- Slides generados -->
+    <div class="card slides-output" id="slides-output">
+      <div class="card-body">
+        <div class="result-header">
+          <h3>Slides generados</h3>
+          <span class="count" id="slides-count">0 slides</span>
+        </div>
+        <div class="slides-grid" id="slides-grid"></div>
+      </div>
+    </div>
+
+    <!-- Descargar ZIP -->
+    <a class="btn-download" id="btn-download" download>
+      <span>⬇</span>
+      <span>Descargar carrusel completo (.zip)</span>
+    </a>
+
+    <!-- Caption -->
+    <div class="card caption-output" id="caption-output">
+      <div class="card-body">
+        <div class="result-header">
+          <h3>Caption para Instagram</h3>
+          <span class="count">Listo para copiar</span>
+        </div>
+        <div class="caption-body" id="caption-text">
+          <button class="btn-copy" onclick="copyCaption()">Copiar</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</div><!-- /page-wrapper -->
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<script>
+// ─── Collapsible ─────────────────────────────────────────────────────────────
+
+function toggleSection(id, header) {
+  const body = document.getElementById(id);
+  const open = body.classList.toggle("open");
+  header.classList.toggle("open", open);
+}
+
+// ─── Refs ────────────────────────────────────────────────────────────────────
+
+async function checkRefs() {
+  const res = await fetch("/api/refs/status");
+  const { portada, interior } = await res.json();
+  if (portada)  renderRefPreview("portada");
+  if (interior) renderRefPreview("interior");
+}
+
+function renderRefPreview(type) {
+  const slot = document.getElementById(`slot-${type}`);
+  const el   = document.getElementById(`${type}-preview`);
+  slot.classList.add("has-image");
+  el.innerHTML = `<img src="/refs/${type}.png?t=${Date.now()}"><div class="ref-ok">✓ Cargada</div>`;
+}
+
+async function uploadRef(type, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append(type, file);
+  await fetch("/api/refs", { method: "POST", body: form });
+  renderRefPreview(type);
+}
+
+// ─── Paleta ──────────────────────────────────────────────────────────────────
+
+function syncText(chip) { chip.nextElementSibling.value = chip.value; }
+function syncChip(input) {
+  const v = input.value.trim();
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) input.previousElementSibling.value = v;
+}
+function getPaleta() {
+  return Array.from(document.querySelectorAll(".palette-row input[type=text]"))
+    .map(i => i.value.trim()).filter(Boolean);
+}
+
+// ─── Slides manuales ─────────────────────────────────────────────────────────
+
+const LAYOUTS = ["portada","mito-verdad","texto-imagen","texto-dos-columnas","texto-producto","card-oscura","antes-despues","solo-tipografia"];
+let slideCount = 0;
+
+function addSlide(data = {}) {
+  slideCount++;
+  const n = slideCount;
+  const div = document.createElement("div");
+  div.className = "slide-item";
+  div.id = `slide-item-${n}`;
+  div.innerHTML = `
+    <div class="slide-header">
+      <span class="slide-label">Slide ${n}</span>
+      <button class="btn-remove" onclick="removeSlide(${n})" title="Eliminar">✕</button>
+    </div>
+    <div class="row-2">
+      <select id="st-${n}">
+        <option value="contenido" ${data.tipo==='contenido'?'selected':''}>contenido</option>
+        <option value="portada"   ${data.tipo==='portada'?'selected':''}>portada</option>
+        <option value="cta"       ${data.tipo==='cta'?'selected':''}>cta</option>
+      </select>
+      <select id="sl-${n}">
+        ${LAYOUTS.map(l=>`<option value="${l}" ${data.layout===l?'selected':''}>${l}</option>`).join("")}
+      </select>
+    </div>
+    <input  type="text" id="sti-${n}" placeholder="Título" value="${data.titulo||''}">
+    <input  type="text" id="ssu-${n}" placeholder="Subtítulo (opcional)" value="${data.subtitulo||''}">
+    <textarea id="stx-${n}" placeholder="Texto (opcional)">${data.texto||''}</textarea>`;
+  document.getElementById("slides-list").appendChild(div);
+}
+
+function removeSlide(n) {
+  document.getElementById(`slide-item-${n}`)?.remove();
+}
+
+function getSlides() {
+  const items = document.querySelectorAll(".slide-item");
+  if (!items.length) return null;
+  return Array.from(items).map((item, i) => {
+    const n = item.id.replace("slide-item-", "");
+    return {
+      numero: i + 1,
+      tipo:      document.getElementById(`st-${n}`)?.value  || "contenido",
+      layout:    document.getElementById(`sl-${n}`)?.value  || "texto-imagen",
+      titulo:    document.getElementById(`sti-${n}`)?.value || "",
+      subtitulo: document.getElementById(`ssu-${n}`)?.value || null,
+      texto:     document.getElementById(`stx-${n}`)?.value || null,
+      ctaTexto:  "→",
+    };
+  });
+}
+
+// ─── Parse contenido libre ───────────────────────────────────────────────────
+
+async function parseContenido() {
+  const contenido = document.getElementById("contenido-libre").value.trim();
+  if (!contenido) { alert("Pegá el contenido primero"); return; }
+
+  const btn = document.getElementById("btn-parse");
+  btn.textContent = "⏳ Estructurando...";
+  btn.disabled = true;
+
+  try {
+    const res = await fetch("/api/parse-slides", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ contenido }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    // Abrir sección de slides y cargar
+    const slidesBody = document.getElementById("slides-section");
+    const slidesHeader = slidesBody.previousElementSibling;
+    slidesBody.classList.add("open");
+    slidesHeader.classList.add("open");
+    document.getElementById("slides-list").innerHTML = "";
+    slideCount = 0;
+    data.slides.forEach(s => addSlide(s));
+
+    if (!document.getElementById("tema").value && data.slides[0]) {
+      document.getElementById("tema").value = data.slides[0].titulo;
+    }
+
+    btn.textContent = `✅ ${data.slides.length} slides estructurados`;
+  } catch (err) {
+    alert("Error: " + err.message);
+    btn.textContent = "✨ Estructurar en slides automáticamente";
+  }
+  btn.disabled = false;
+}
+
+// ─── Generar ─────────────────────────────────────────────────────────────────
+
+let totalSlides = 0, doneSlides = 0;
+
+function log(msg, type = "") {
+  const box = document.getElementById("log-box");
+  const line = document.createElement("div");
+  if (type) line.className = `log-${type}`;
+  line.textContent = msg;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function setProgress(done, total) {
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById("progress-fill").style.width = pct + "%";
+  document.getElementById("progress-pct").textContent  = pct + "%";
+}
+
+function setStep(n) {
+  document.querySelectorAll(".step-tab").forEach((t, i) => {
+    t.classList.remove("active", "done");
+    if (i + 1 < n)  t.classList.add("done");
+    if (i + 1 === n) t.classList.add("active");
+  });
+}
+
+function generate() {
+  const tema = document.getElementById("tema").value.trim();
+  if (!tema) { alert("Ingresá el tema del carrusel"); return; }
+
+  const config = {
+    tema,
+    cantidadSlides:       parseInt(document.getElementById("cantidadSlides").value) || 7,
+    tono:                 document.getElementById("tono").value,
+    audiencia:            document.getElementById("audiencia").value,
+    tipografiaTitulos:    document.getElementById("tipografiaTitulos").value,
+    tipografiaSubtitulos: document.getElementById("tipografiaSubtitulos").value,
+    paleta:               getPaleta(),
+    modelo:               document.getElementById("modelo").value,
+  };
+
+  const slides = getSlides();
+  if (slides && slides.length) {
+    config.slides = slides;
+    config.cantidadSlides = slides.length;
+  }
+
+  // Reset UI
+  document.getElementById("empty-state").style.display    = "none";
+  document.getElementById("progress-card").classList.add("visible");
+  document.getElementById("slides-output").style.display  = "none";
+  document.getElementById("caption-output").style.display = "none";
+  document.getElementById("slides-grid").innerHTML        = "";
+  document.getElementById("log-box").innerHTML            = "";
+  document.getElementById("caption-text").innerHTML       = '<button class="btn-copy" onclick="copyCaption()">Copiar</button>';
+  document.getElementById("btn-generate").disabled        = true;
+  document.getElementById("btn-generate").innerHTML       = '<span>Generando...</span>';
+  document.getElementById("slides-count").textContent     = "0 slides";
+  setProgress(0, 0);
+  setStep(4);
+  totalSlides = 0; doneSlides = 0;
+
+  const es = new EventSource(`/api/generate?config=${encodeURIComponent(JSON.stringify(config))}`);
+
+  es.onmessage = (e) => {
+    const d = JSON.parse(e.data);
+
+    if (d.type === "log") {
+      log(d.msg, d.msg.includes("✅") ? "ok" : d.msg.includes("❌") ? "err" : "");
+    }
+    else if (d.type === "total") {
+      totalSlides = d.total;
+    }
+    else if (d.type === "slide") {
+      doneSlides++;
+      document.getElementById("slides-output").style.display = "block";
+      document.getElementById("slides-count").textContent    = `${doneSlides} slides`;
+      setProgress(doneSlides, totalSlides);
+
+      const card = document.createElement("div");
+      card.className = "slide-card";
+      card.onclick = () => openLightbox(d.path);
+      card.innerHTML = `
+        <div class="slide-badge">${d.slideNum}</div>
+        <img src="${d.path}?t=${Date.now()}" loading="lazy" alt="Slide ${d.slideNum}">
+        <div class="slide-footer">${d.titulo}</div>`;
+      document.getElementById("slides-grid").appendChild(card);
+    }
+    else if (d.type === "caption") {
+      document.getElementById("caption-output").style.display = "block";
+      document.getElementById("caption-text").innerHTML =
+        `<button class="btn-copy" onclick="copyCaption()">Copiar</button>${d.caption}`;
+    }
+    else if (d.type === "done") {
+      log("✅ ¡Carrusel listo!", "ok");
+      setProgress(totalSlides, totalSlides);
+      document.getElementById("btn-generate").disabled = false;
+      document.getElementById("btn-generate").innerHTML = "<span>Generar carrusel</span><span>→</span>";
+      // Activar botón de descarga
+      const btnDown = document.getElementById("btn-download");
+      btnDown.href = `/api/download?dir=${encodeURIComponent(d.outputDir)}`;
+      btnDown.classList.add("visible");
+      es.close();
+    }
+    else if (d.type === "error") {
+      log("❌ " + d.msg, "err");
+      document.getElementById("btn-generate").disabled = false;
+      document.getElementById("btn-generate").innerHTML = "<span>Generar carrusel</span><span>→</span>";
+      setStep(1);
+      es.close();
+    }
+  };
+
+  es.onerror = () => {
+    log("❌ Se perdió la conexión con el servidor", "err");
+    document.getElementById("btn-generate").disabled = false;
+    document.getElementById("btn-generate").innerHTML = "<span>Generar carrusel</span><span>→</span>";
+    es.close();
+  };
+}
+
+// ─── Caption ─────────────────────────────────────────────────────────────────
+
+function copyCaption() {
+  const box  = document.getElementById("caption-text");
+  const text = box.innerText.replace("Copiar", "").trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = box.querySelector(".btn-copy");
+    btn.textContent = "✓ Copiado";
+    setTimeout(() => btn.textContent = "Copiar", 2000);
+  });
+}
+
+// ─── Lightbox ────────────────────────────────────────────────────────────────
+
+function openLightbox(src) {
+  document.getElementById("lightbox-img").src = src;
+  document.getElementById("lightbox").classList.add("open");
+}
+function closeLightbox() {
+  document.getElementById("lightbox").classList.remove("open");
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+checkRefs();
+</script>
+</body>
+</html>

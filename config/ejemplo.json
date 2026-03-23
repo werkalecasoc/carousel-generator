@@ -1,0 +1,12 @@
+{
+  "tema": "productividad para emprendedores",
+  "cantidadSlides": 7,
+  "tono": "educativo",
+  "audiencia": "emprendedores y freelancers",
+  "estiloPortada": "./refs/portada.png",
+  "estiloInterior": "./refs/interior.png",
+  "tipografiaTitulos": "Montserrat Bold",
+  "tipografiaSubtitulos": "Inter Regular",
+  "paleta": ["#1A1A2E", "#E94560", "#FFFFFF"],
+  "modelo": "gemini-2.5-flash-image"
+}
