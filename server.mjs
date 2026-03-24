@@ -38,12 +38,10 @@ async function preloadStyles() {
   const portadaPath  = path.join(__dirname, "refs/portada.png");
   const interiorPath = path.join(__dirname, "refs/interior.png");
 
-  // Descargar desde Cloudinary si faltan localmente
-  const faltaPortada  = !fs.existsSync(portadaPath);
-  const faltaInterior = !fs.existsSync(interiorPath);
-  if (faltaPortada || faltaInterior) {
+  // Siempre descargar desde Cloudinary si está configurado (sobreescribe las del repo)
+  if (process.env.CLOUDINARY_CLOUD_NAME) {
     console.log("☁️  Descargando refs desde Cloudinary...");
-    await downloadRefs(portadaPath, interiorPath).catch(() => null);
+    await downloadRefs(portadaPath, interiorPath).catch((e) => console.error("❌ Error descargando refs:", e.message));
   }
 
   if (fs.existsSync(portadaPath)) {
