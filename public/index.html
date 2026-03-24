@@ -385,13 +385,37 @@
   }
   .slide-card img { width: 100%; display: block; }
   .slide-card .slide-footer {
-    padding: 8px 10px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .slide-footer .sf-layout {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
+  .slide-footer .sf-titulo {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.3;
+  }
+  .slide-footer .sf-sub {
     font-size: 10px;
     color: var(--text-soft);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-top: 1px solid var(--border);
+    font-style: italic;
+    line-height: 1.3;
+  }
+  .slide-footer .sf-texto {
+    font-size: 10px;
+    color: var(--text-light);
+    line-height: 1.3;
+    margin-top: 1px;
   }
   .slide-badge {
     position: absolute;
@@ -706,7 +730,7 @@
     <div id="aviso-tiempo" style="display:none; background:#FFF8E7; border:1.5px solid #F59E0B; border-radius:12px; padding:16px 20px; display:none; align-items:flex-start; gap:12px">
       <span style="font-size:22px;flex-shrink:0">⏱️</span>
       <div>
-        <div style="font-family:'Raleway',sans-serif; font-weight:800; font-size:14px; color:#92400E; margin-bottom:4px">ATENCIÓN — Tiempo de generación</div>
+        <div style="font-family:'Lato',sans-serif; font-weight:800; font-size:14px; color:#92400E; margin-bottom:4px">ATENCIÓN — Tiempo de generación</div>
         <div style="font-size:12px; color:#78350F; line-height:1.6">
           En marzo 2026, Nano Banana tarda en promedio <strong>2 minutos por imagen</strong>. Con 5 slides son aproximadamente <strong>10 minutos en total</strong>.<br>
           La pantalla no se tildó — el proceso está corriendo. Podés hacer otra cosa mientras tanto, <strong>pero no cerrés esta pestaña</strong>.
@@ -1050,6 +1074,9 @@ function generate(slidesOverride = null) {
   setStep(4);
   totalSlides = 0; doneSlides = 0; failedSlides = [];
   if (slidesOverride) lastSlidesUsed = slidesOverride;
+  // Mapa de contenido por número de slide (para mostrar en placeholders)
+  const slideDataMap = {};
+  if (slides && slides.length) slides.forEach(s => { slideDataMap[String(s.numero).padStart(2, "0")] = s; });
 
   const es = new EventSource(`/api/generate?config=${encodeURIComponent(JSON.stringify(config))}`);
 
@@ -1068,6 +1095,7 @@ function generate(slidesOverride = null) {
       document.getElementById("slides-output").style.display = "block";
       for (let i = 1; i <= totalSlides; i++) {
         const num = String(i).padStart(2, "0");
+        const sd = slideDataMap[num];
         const ph = document.createElement("div");
         ph.className = "slide-card";
         ph.id = `slide-ph-${num}`;
@@ -1076,7 +1104,14 @@ function generate(slidesOverride = null) {
           <div style="aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;background:var(--bg-soft)">
             <span style="font-size:28px;animation:spin 1.2s linear infinite;display:inline-block">⏳</span>
           </div>
-          <div class="slide-footer" style="color:var(--text-light)">Generando...</div>`;
+          <div class="slide-footer">
+            ${sd ? `
+              <div class="sf-layout">${sd.layout || sd.tipo || ''}</div>
+              <div class="sf-titulo">${sd.titulo || ''}</div>
+              ${sd.subtitulo ? `<div class="sf-sub">${sd.subtitulo}</div>` : ''}
+              ${sd.texto ? `<div class="sf-texto">${sd.texto}</div>` : ''}
+            ` : `<div class="sf-titulo" style="color:var(--text-light)">Generando...</div>`}
+          </div>`;
         grid.appendChild(ph);
       }
     }
@@ -1093,7 +1128,12 @@ function generate(slidesOverride = null) {
       ph.innerHTML = `
         <div class="slide-badge">${d.slideNum}</div>
         <img src="${d.path}?t=${Date.now()}" loading="lazy" alt="Slide ${d.slideNum}">
-        <div class="slide-footer">${d.titulo}</div>`;
+        <div class="slide-footer">
+          ${d.layout ? `<div class="sf-layout">${d.layout}</div>` : ''}
+          <div class="sf-titulo">${d.titulo}</div>
+          ${d.subtitulo ? `<div class="sf-sub">${d.subtitulo}</div>` : ''}
+          ${d.texto ? `<div class="sf-texto">${d.texto}</div>` : ''}
+        </div>`;
       if (!ph.parentElement) document.getElementById("slides-grid").appendChild(ph);
     }
     else if (d.type === "caption") {

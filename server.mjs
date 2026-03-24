@@ -268,7 +268,7 @@ app.get("/api/generate", async (req, res) => {
           }
         );
         const publicPath = `/output/carrusel-${slug}-${fecha}/${filename}`;
-        send("slide", { slideNum, path: publicPath, titulo: slide.titulo });
+        send("slide", { slideNum, path: publicPath, titulo: slide.titulo, subtitulo: slide.subtitulo || null, texto: slide.texto || null, layout: slide.layout || slide.tipo });
         send("log", { msg: `     ✅ Listo` });
         results.push({ slide: slide.numero, path: outputPath, status: "ok" });
       } catch (err) {
