@@ -9,6 +9,7 @@ import { buildPrompt } from "./src/buildPrompt.mjs";
 import { generateSlide } from "./src/generateSlide.mjs";
 import { generateInstagramCopy } from "./src/generateInstagramCopy.mjs";
 import { analyzeStyle } from "./src/analyzeStyle.mjs";
+import { uploadRef, downloadRefs } from "./src/cloudinaryStorage.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -32,10 +33,19 @@ app.use("/refs", express.static(path.join(__dirname, "refs")));
 // Cache de estilos analizados (se actualiza al subir nueva imagen)
 const styleCache = { portada: null, interior: null };
 
-// Al arrancar, analizar imágenes existentes si las hay
+// Al arrancar, descarga refs desde Cloudinary si no existen localmente, luego analiza estilos
 async function preloadStyles() {
   const portadaPath  = path.join(__dirname, "refs/portada.png");
   const interiorPath = path.join(__dirname, "refs/interior.png");
+
+  // Descargar desde Cloudinary si faltan localmente
+  const faltaPortada  = !fs.existsSync(portadaPath);
+  const faltaInterior = !fs.existsSync(interiorPath);
+  if (faltaPortada || faltaInterior) {
+    console.log("☁️  Descargando refs desde Cloudinary...");
+    await downloadRefs(portadaPath, interiorPath).catch(() => null);
+  }
+
   if (fs.existsSync(portadaPath))  styleCache.portada  = await analyzeStyle(portadaPath,  "portada").catch(() => null);
   if (fs.existsSync(interiorPath)) styleCache.interior = await analyzeStyle(interiorPath, "interior").catch(() => null);
   if (styleCache.portada)  console.log("✅ Estilo portada analizado");
@@ -48,15 +58,19 @@ app.post("/api/refs", upload.fields([
   { name: "portada", maxCount: 1 },
   { name: "interior", maxCount: 1 },
 ]), async (req, res) => {
-  // Analizar el estilo de cada imagen subida y actualizar el cache
+  // Subir a Cloudinary + analizar estilo de cada imagen subida
   if (req.files?.portada) {
+    const localPath = path.join(__dirname, "refs/portada.png");
+    await uploadRef(localPath, "portada").catch(() => null);
     console.log("🔍 Analizando estilo de portada...");
-    styleCache.portada  = await analyzeStyle(path.join(__dirname, "refs/portada.png"),  "portada").catch(() => null);
+    styleCache.portada  = await analyzeStyle(localPath, "portada").catch(() => null);
     console.log("✅ Estilo portada actualizado");
   }
   if (req.files?.interior) {
+    const localPath = path.join(__dirname, "refs/interior.png");
+    await uploadRef(localPath, "interior").catch(() => null);
     console.log("🔍 Analizando estilo de interior...");
-    styleCache.interior = await analyzeStyle(path.join(__dirname, "refs/interior.png"), "interior").catch(() => null);
+    styleCache.interior = await analyzeStyle(localPath, "interior").catch(() => null);
     console.log("✅ Estilo interior actualizado");
   }
   res.json({ ok: true });
