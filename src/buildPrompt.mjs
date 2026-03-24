@@ -25,13 +25,13 @@ ${estiloAnalizado}`
 
   // ── 2. Especificaciones de marca ─────────────────────────────────────────
   const brandBlock = `
-MANDATORY BRAND SPECIFICATIONS — these override everything:
-- Background color: ${config.paleta?.[3] || "#FFFFFF"}
-- Primary color: ${config.paleta?.[0] || "#000000"}
+MANDATORY BRAND SPECIFICATIONS — apply these exactly, no exceptions:
+- BACKGROUND: fill the entire slide background with solid color ${config.paleta?.[3] || "#FFFFFF"} — no gradients, no textures unless the style guide specifies otherwise
+- Primary text color: ${config.paleta?.[0] || "#000000"}
 - Accent color 1: ${config.paleta?.[1] || "#888888"}
 - Accent color 2: ${config.paleta?.[2] || "#AAAAAA"}
-- Title font: ${config.tipografiaTitulos} (use this exact font family)
-- Body font: ${config.tipografiaSubtitulos} (use this exact font family)
+- Title font: ${config.tipografiaTitulos} — use this exact typeface for all titles
+- Body font: ${config.tipografiaSubtitulos} — use this exact typeface for body text
 ${config.marca ? `- Brand name: "${config.marca}" — small elegant text, top center of slide` : "- No brand tag"}`.trim();
 
   // ── 3. Contenido del slide ───────────────────────────────────────────────

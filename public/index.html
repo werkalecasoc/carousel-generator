@@ -646,7 +646,12 @@
           </div>
           <div class="field">
             <label>Cantidad de slides</label>
-            <input type="number" id="cantidadSlides" value="5" min="3" max="20">
+            <div style="display:flex;gap:6px;align-items:center">
+              <input type="number" id="cantidadSlides" value="5" min="3" max="20" style="width:70px">
+              <button type="button" onclick="document.getElementById('cantidadSlides').value=5" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg-soft);font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif">5</button>
+              <button type="button" onclick="document.getElementById('cantidadSlides').value=7" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg-soft);font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif">7</button>
+              <button type="button" onclick="document.getElementById('cantidadSlides').value=10" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:6px;background:var(--bg-soft);font-size:12px;cursor:pointer;font-family:'Poppins',sans-serif">10</button>
+            </div>
           </div>
         </div>
 
@@ -805,6 +810,12 @@
         <div class="slides-grid" id="slides-grid"></div>
       </div>
     </div>
+
+    <!-- Reintentar fallidos -->
+    <button class="btn-generate" id="btn-retry" style="display:none;background:#F59E0B" onclick="retryFailed()">
+      <span>Reintentar slides fallidos</span>
+      <span id="failed-count-badge"></span>
+    </button>
 
     <!-- Descargar ZIP -->
     <button class="btn-download" id="btn-download" onclick="downloadZip()">
@@ -1039,6 +1050,7 @@ function generateFromPreview() {
 // ─── Generar imágenes ─────────────────────────────────────────────────────────
 
 let totalSlides = 0, doneSlides = 0;
+let failedSlides = [], lastSlidesUsed = [];
 
 function log(msg, type = "") {
   const box = document.getElementById("log-box");
@@ -1106,9 +1118,11 @@ function generate(slidesOverride = null) {
   if (btnGenImg) { btnGenImg.disabled = true; btnGenImg.innerHTML = "<span>Generando...</span>"; }
   setBtnPreview(true);
   document.getElementById("slides-count").textContent = "0 slides";
+  document.getElementById("btn-retry").style.display = "none";
   setProgress(0, 0);
   setStep(4);
-  totalSlides = 0; doneSlides = 0;
+  totalSlides = 0; doneSlides = 0; failedSlides = [];
+  if (slidesOverride) lastSlidesUsed = slidesOverride;
 
   const es = new EventSource(`/api/generate?config=${encodeURIComponent(JSON.stringify(config))}`);
 
@@ -1160,6 +1174,16 @@ function generate(slidesOverride = null) {
       document.getElementById("caption-text").innerHTML =
         `<button class="btn-copy" onclick="copyCaption()">Copiar</button>${d.caption}`;
     }
+    else if (d.type === "slide-error") {
+      const num = String(d.slideNum).padStart(2, "0");
+      const ph = document.getElementById(`slide-ph-${num}`);
+      if (ph) {
+        ph.querySelector("div[style]").innerHTML = `<span style="font-size:22px">❌</span>`;
+        ph.querySelector(".slide-footer").textContent = "Error al generar";
+        ph.querySelector(".slide-footer").style.color = "var(--danger)";
+      }
+      if (d.slideData) failedSlides.push(d.slideData);
+    }
     else if (d.type === "done") {
       log("✅ ¡Carrusel listo!", "ok");
       setProgress(totalSlides, totalSlides);
@@ -1168,6 +1192,11 @@ function generate(slidesOverride = null) {
       const btnDown = document.getElementById("btn-download");
       btnDown.dataset.dir = d.outputDir;
       btnDown.classList.add("visible");
+      if (failedSlides.length > 0) {
+        const btnRetry = document.getElementById("btn-retry");
+        btnRetry.style.display = "flex";
+        document.getElementById("failed-count-badge").textContent = `(${failedSlides.length})`;
+      }
       es.close();
     }
     else if (d.type === "error") {
@@ -1185,6 +1214,13 @@ function generate(slidesOverride = null) {
     if (btnGenImg) { btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
     es.close();
   };
+}
+
+// ─── Retry fallidos ──────────────────────────────────────────────────────────
+
+function retryFailed() {
+  if (!failedSlides.length) return;
+  generate([...failedSlides]);
 }
 
 // ─── Download ZIP ─────────────────────────────────────────────────────────────

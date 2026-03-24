@@ -273,6 +273,7 @@ app.get("/api/generate", async (req, res) => {
         results.push({ slide: slide.numero, path: outputPath, status: "ok" });
       } catch (err) {
         send("log", { msg: `     ❌ Error en slide ${slideNum}: ${err.message}` });
+        send("slide-error", { slideNum, slideData: slide });
         results.push({ slide: slide.numero, status: "error", error: err.message });
       }
 
@@ -342,7 +343,7 @@ async function generateWithRetry(prompt, styleImage, outputPath, modelo, onRetry
       await generateSlide(prompt, styleImage, outputPath, modelo);
       return;
     } catch (err) {
-      const isTemp = /503|UNAVAILABLE|high demand|overloaded|temporarily/i.test(err.message);
+      const isTemp = /503|UNAVAILABLE|high demand|overloaded|temporarily|fetch failed|ECONNRESET|ETIMEDOUT|network/i.test(err.message);
       if (isTemp && attempt < maxRetries) {
         const waitSecs = attempt * 6;
         await onRetry(attempt, maxRetries, waitSecs);
