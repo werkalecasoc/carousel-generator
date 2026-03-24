@@ -21,19 +21,24 @@ export function buildPrompt(slide, config, estiloAnalizado = null) {
     ? buildPortadaPrompt(slide, config)
     : buildInteriorPrompt(slide, config);
 
-  // Bloque de estilo analizado de la imagen de referencia
-  const estiloBlock = estiloAnalizado ? `
-REFERENCE STYLE ANALYSIS (extracted from the uploaded reference image — apply this style exactly):
+  // El estilo analizado va PRIMERO — es la directiva de mayor prioridad
+  if (estiloAnalizado) {
+    const estiloBlock = `
+STYLE DIRECTIVE — HIGHEST PRIORITY. This overrides any conflicting visual instructions below.
+Replicate the exact visual style of the reference image as described here:
 ${estiloAnalizado}
 
-IMPORTANT: Adapt the above style to use these specific brand colors and fonts:
-- Colors: ${config.paleta?.join(", ")}
+Adapt that style using these brand specifications:
+- Color palette: ${config.paleta?.join(", ")}
 - Title font: ${config.tipografiaTitulos}
 - Body font: ${config.tipografiaSubtitulos}
-The composition, mood, lighting and layout must match the reference style. Colors and typography must match the brand config.
-`.trim() : "";
+The mood, lighting, composition, and aesthetic MUST match the reference. Only colors and fonts are replaced with the brand values above.
+`.trim();
 
-  return [base, estiloBlock, PEOPLE_RULE].filter(Boolean).join("\n\n");
+    return [estiloBlock, base, PEOPLE_RULE].filter(Boolean).join("\n\n");
+  }
+
+  return [base, PEOPLE_RULE].filter(Boolean).join("\n\n");
 }
 
 // ─── PORTADA ─────────────────────────────────────────────────────────────────
