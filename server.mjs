@@ -354,9 +354,10 @@ async function generateWithRetry(prompt, styleImage, outputPath, modelo, onRetry
   }
 }
 
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
   console.log(`\n🍌 Carousel Generator corriendo en: http://localhost:${PORT}\n`);
   import("child_process").then(({ exec }) => exec(`open http://localhost:${PORT}`));
   console.log(`(El puerto 3000 está ocupado por Remotion — usamos el 3001)\n`);
-  await preloadStyles();
+  // No-bloqueante: el servidor responde de inmediato, el análisis corre en background
+  preloadStyles().catch(e => console.error("❌ preloadStyles:", e.message));
 });
