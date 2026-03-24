@@ -26,7 +26,7 @@ ${estiloAnalizado}`
   // ── 2. Especificaciones de marca ─────────────────────────────────────────
   const brandBlock = `
 MANDATORY BRAND SPECIFICATIONS — apply these exactly, no exceptions:
-- BACKGROUND: fill the entire slide background with solid color ${config.paleta?.[3] || "#FFFFFF"} — no gradients, no textures unless the style guide specifies otherwise
+- BACKGROUND: replicate exactly the background from the style reference above (color, texture, gradient, or image treatment — whatever the reference uses). Do NOT use a plain white background unless the reference has one.
 - Primary text color: ${config.paleta?.[0] || "#000000"}
 - Accent color 1: ${config.paleta?.[1] || "#888888"}
 - Accent color 2: ${config.paleta?.[2] || "#AAAAAA"}
