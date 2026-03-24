@@ -2,9 +2,9 @@ import { GoogleGenAI } from "@google/genai";
 import fs from "fs";
 
 /**
- * Analiza una imagen de referencia y extrae su estilo visual en texto detallado.
- * Ese texto se inyecta luego en cada prompt de generación para que el modelo
- * respete el estilo aunque no "vea" la imagen directamente.
+ * Analiza una imagen de referencia y extrae su ESTILO VISUAL en texto detallado.
+ * Este texto se inyecta en el prompt de generación para que el modelo
+ * CREE UNA IMAGEN NUEVA con ese estilo — no copia ni edita la original.
  */
 export async function analyzeStyle(imagePath, tipo = "portada") {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
@@ -13,18 +13,20 @@ export async function analyzeStyle(imagePath, tipo = "portada") {
   const imageBase64 = imageBytes.toString("base64");
   const mimeType    = imagePath.endsWith(".png") ? "image/png" : "image/jpeg";
 
-  const pregunta = tipo === "portada"
-    ? `Analizá esta imagen de portada de carrusel de Instagram con máximo detalle visual.
-       Describí: paleta exacta de colores (hex aproximados), temperatura del color, tipo de fotografía,
-       iluminación, composición, posición y tamaño de la tipografía sobre la imagen, estilo editorial,
-       mood general, texturas, contraste, saturación. Sé muy específico y técnico.
-       Formato: párrafo descriptivo continuo en inglés, orientado a ser usado como prompt de generación de imagen.`
-    : `Analizá esta imagen interior de carrusel de Instagram con máximo detalle visual.
-       Describí: color de fondo exacto (hex aproximado), paleta de colores usada, temperatura,
-       estilo tipográfico (tamaño relativo, peso, mezcla de estilos), jerarquía visual,
-       elementos decorativos (flechas, líneas, cards, botones pill), espaciado y márgenes,
-       mood general, estilo de fotografías o ilustraciones embebidas si las hay.
-       Formato: párrafo descriptivo continuo en inglés, orientado a ser usado como prompt de generación de imagen.`;
+  const pregunta = `Analizá esta imagen y extraé ÚNICAMENTE su estilo visual para usarlo como guía de diseño.
+NO describas el contenido ni los objetos de la imagen.
+SÍ describí con precisión técnica:
+
+1. PALETA: colores exactos usados (hex aproximados), temperatura (cálida/fría/neutra)
+2. FONDO: color exacto, ¿es plano, degradado, texturizado?
+3. TIPOGRAFÍA VISUAL: ¿bold/light/mixed? ¿tiene sombras? ¿outline? ¿mezcla serif+sans? ¿tamaños relativos entre título y cuerpo?
+4. ESTILO GRÁFICO: ¿fotografía? ¿ilustración? ¿3D render? ¿flat design? ¿minimalista? ¿ornamentado?
+5. ELEMENTOS DECORATIVOS: ¿líneas? ¿flechas? ¿pills/botones? ¿íconos? ¿overlays? ¿shapes geométricos?
+6. COMPOSICIÓN: ¿cómo se distribuyen los elementos? ¿márgenes amplios o ajustados? ¿jerarquía visual?
+7. SOMBRAS Y PROFUNDIDAD: ¿hay drop shadows? ¿glassmorphism? ¿todo plano?
+8. MOOD GENERAL: ¿premium/editorial? ¿corporate? ¿playful? ¿minimalista?
+
+Respondé en inglés, en párrafo continuo orientado a ser usado como prompt de generación de imagen. Sé muy específico y técnico. Máximo 200 palabras.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash",

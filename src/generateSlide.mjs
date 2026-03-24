@@ -4,33 +4,15 @@ import path from "path";
 
 /**
  * Genera una imagen para un slide usando Nano Banana (Gemini Image Generation).
- * Usa la imagen de referencia de estilo como guía visual.
- *
- * @param {string} prompt - Prompt de texto para la imagen
- * @param {string} styleImagePath - Ruta a la imagen de referencia de estilo
- * @param {string} outputPath - Ruta donde guardar la imagen generada
+ * Solo usa el prompt de texto — NO pasa la imagen de referencia al generador
+ * para que cree una imagen nueva en ese estilo, no que edite la original.
  */
 export async function generateSlide(prompt, styleImagePath, outputPath, model = "gemini-3.1-flash-image-preview") {
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-  // Carga la imagen de referencia de estilo
-  const styleImageBytes = fs.readFileSync(styleImagePath);
-  const styleImageBase64 = styleImageBytes.toString("base64");
-  const styleMimeType = getMimeType(styleImagePath);
-
-  const contents = [
-    {
-      inlineData: {
-        mimeType: styleMimeType,
-        data: styleImageBase64,
-      },
-    },
-    `Use the visual style of this reference image (colors, mood, layout, aesthetic) to generate the following slide:\n\n${prompt}`,
-  ];
-
   const response = await ai.models.generateContent({
     model: model,
-    contents,
+    contents: prompt,
     config: {
       responseModalities: ["TEXT", "IMAGE"],
       imageConfig: {
@@ -55,15 +37,4 @@ export async function generateSlide(prompt, styleImagePath, outputPath, model = 
   }
 
   return outputPath;
-}
-
-function getMimeType(filePath) {
-  const ext = path.extname(filePath).toLowerCase();
-  const map = {
-    ".jpg": "image/jpeg",
-    ".jpeg": "image/jpeg",
-    ".png": "image/png",
-    ".webp": "image/webp",
-  };
-  return map[ext] || "image/jpeg";
 }
