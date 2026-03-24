@@ -1099,20 +1099,39 @@ function generate(slidesOverride = null) {
     }
     else if (d.type === "total") {
       totalSlides = d.total;
+      // Pre-llenar grilla con placeholders con spinner
+      const grid = document.getElementById("slides-grid");
+      grid.innerHTML = "";
+      document.getElementById("slides-output").style.display = "block";
+      for (let i = 1; i <= totalSlides; i++) {
+        const num = String(i).padStart(2, "0");
+        const ph = document.createElement("div");
+        ph.className = "slide-card";
+        ph.id = `slide-ph-${num}`;
+        ph.innerHTML = `
+          <div class="slide-badge">${num}</div>
+          <div style="aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;background:var(--bg-soft)">
+            <span style="font-size:28px;animation:spin 1.2s linear infinite;display:inline-block">⏳</span>
+          </div>
+          <div class="slide-footer" style="color:var(--text-light)">Generando...</div>`;
+        grid.appendChild(ph);
+      }
     }
     else if (d.type === "slide") {
       doneSlides++;
-      document.getElementById("slides-output").style.display = "block";
-      document.getElementById("slides-count").textContent    = `${doneSlides} slides`;
+      document.getElementById("slides-count").textContent = `${doneSlides} slides`;
       setProgress(doneSlides, totalSlides);
-      const card = document.createElement("div");
-      card.className = "slide-card";
-      card.onclick = () => openLightbox(d.path);
-      card.innerHTML = `
+      // Reemplazar placeholder con imagen real
+      const num = String(d.slideNum).padStart(2, "0");
+      const ph = document.getElementById(`slide-ph-${num}`) || document.createElement("div");
+      ph.className = "slide-card";
+      ph.removeAttribute("id");
+      ph.onclick = () => openLightbox(d.path);
+      ph.innerHTML = `
         <div class="slide-badge">${d.slideNum}</div>
         <img src="${d.path}?t=${Date.now()}" loading="lazy" alt="Slide ${d.slideNum}">
         <div class="slide-footer">${d.titulo}</div>`;
-      document.getElementById("slides-grid").appendChild(card);
+      if (!ph.parentElement) document.getElementById("slides-grid").appendChild(ph);
     }
     else if (d.type === "caption") {
       document.getElementById("caption-output").style.display = "block";
