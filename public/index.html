@@ -180,6 +180,7 @@
   .palette-row input[type=text]:focus { border-color: var(--accent); }
 
   /* ── COLLAPSIBLE ── */
+  /* legacy — kept for reference
   .collapsible-header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 12px 14px;
@@ -198,24 +199,8 @@
   .collapsible-header.open .chevron { transform: rotate(180deg); }
   .collapsible-body { display: none; margin-top: 10px; }
   .collapsible-body.open { display: block; }
+  */
 
-  /* ── PARSE BUTTON ── */
-  .btn-parse {
-    width: 100%;
-    background: var(--accent-soft);
-    color: var(--accent);
-    border: 1.5px solid #dda8f5;
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 12px;
-    font-weight: 600;
-    font-family: 'Lato', sans-serif;
-    cursor: pointer;
-    transition: background .15s, border-color .15s;
-    margin-top: 6px;
-  }
-  .btn-parse:hover { background: #E0E7FF; border-color: var(--accent); }
-  .btn-parse:disabled { opacity: .5; cursor: not-allowed; }
 
   /* ── SLIDES MANUALES ── */
   .slide-item {
@@ -587,8 +572,8 @@
       </div>
       <div class="card-body">
         <div class="field">
-          <label>Tema <span style="color:var(--danger)">*</span></label>
-          <input type="text" id="tema" placeholder="ej: 7 mitos de WhatsApp para inmobiliarios">
+          <label>Tema o texto completo <span style="color:var(--danger)">*</span></label>
+          <textarea id="tema" rows="3" placeholder="Corto: ej. &quot;7 mitos de WhatsApp para inmobiliarias&quot;&#10;&#10;Largo: pegá el texto completo y la IA lo estructura en slides automáticamente" style="resize:vertical"></textarea>
         </div>
 
         <div class="row-2">
@@ -621,23 +606,6 @@
           <div class="field">
             <label>Marca (opcional)</label>
             <input type="text" id="marca" placeholder="ej: Werkalec">
-          </div>
-        </div>
-
-        <!-- Pegar contenido libre -->
-        <div style="margin-top:4px">
-          <div class="collapsible-header" onclick="toggleSection('paste-section', this)">
-            <span>✨ &nbsp;Pegar contenido completo para estructurar con IA</span>
-            <span class="chevron">▼</span>
-          </div>
-          <div class="collapsible-body" id="paste-section">
-            <div class="field" style="margin-top:10px">
-              <label>Pegá el contenido de tus slides (en lenguaje libre)</label>
-              <textarea id="contenido-libre" placeholder="Ej:&#10;Slide 1 - Hook: ¿Tu equipo pierde contactos?&#10;Slide 2 - Mito: WhatsApp es gratis...&#10;Slide 3 - ..." style="min-height:110px"></textarea>
-            </div>
-            <button class="btn-parse" id="btn-parse" onclick="parseContenido()">
-              ✨ &nbsp;Estructurar en slides automáticamente
-            </button>
           </div>
         </div>
 
@@ -886,64 +854,27 @@ function getPaleta() {
 
 const LAYOUTS = ["portada","mito-verdad","texto-imagen","texto-dos-columnas","texto-producto","card-oscura","antes-despues","solo-tipografia"];
 
-// ─── Parse contenido libre ───────────────────────────────────────────────────
-
-async function parseContenido() {
-  const contenido = document.getElementById("contenido-libre").value.trim();
-  if (!contenido) { alert("Pegá el contenido primero"); return; }
-
-  const btn = document.getElementById("btn-parse");
-  btn.textContent = "⏳ Estructurando...";
-  btn.disabled = true;
-
-  try {
-    const res = await fetch("/api/parse-slides", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contenido }),
-    });
-    const data = await res.json();
-    if (data.error) throw new Error(data.error);
-
-    // Abrir sección de slides y cargar
-    const slidesBody = document.getElementById("slides-section");
-    const slidesHeader = slidesBody.previousElementSibling;
-    slidesBody.classList.add("open");
-    slidesHeader.classList.add("open");
-    document.getElementById("slides-list").innerHTML = "";
-    slideCount = 0;
-    data.slides.forEach(s => addSlide(s));
-
-    if (!document.getElementById("tema").value && data.slides[0]) {
-      document.getElementById("tema").value = data.slides[0].titulo;
-    }
-
-    btn.textContent = `✅ ${data.slides.length} slides estructurados`;
-  } catch (err) {
-    alert("Error: " + err.message);
-    btn.textContent = "✨ Estructurar en slides automáticamente";
-  }
-  btn.disabled = false;
-}
-
 // ─── Previsualizar contenido ──────────────────────────────────────────────────
 
 async function previewContent() {
-  const tema = document.getElementById("tema").value.trim();
-  if (!tema) { alert("Ingresá el tema del carrusel"); return; }
+  const input = document.getElementById("tema").value.trim();
+  if (!input) { alert("Ingresá el tema o el texto del carrusel"); return; }
 
   const btn = document.getElementById("btn-preview");
   btn.disabled = true;
   btn.classList.add("loading");
   btn.innerHTML = "<span style='animation:spin 1s linear infinite;display:inline-block'>⏳</span><span>Generando contenido...</span>";
 
+  // Si es texto largo (más de 80 chars o tiene saltos de línea), tratar como contenido a estructurar
+  const esContenidoLargo = input.length > 80 || input.includes("\n");
+
   try {
     const body = {
-      tema,
+      tema:           esContenidoLargo ? (input.split("\n")[0].slice(0, 60) || "carrusel") : input,
       cantidadSlides: parseInt(document.getElementById("cantidadSlides").value) || 7,
       tono:           document.getElementById("tono").value,
       audiencia:      document.getElementById("audiencia").value,
-      contenido:      document.getElementById("contenido-libre").value.trim() || null,
+      contenido:      esContenidoLargo ? input : null,
     };
 
     const res = await fetch("/api/preview-slides", {
@@ -1054,8 +985,11 @@ function setBtnPreview(loading) {
 }
 
 async function generate(slidesOverride = null) {
-  const tema = document.getElementById("tema").value.trim();
-  if (!tema) { alert("Ingresá el tema del carrusel"); return; }
+  const input = document.getElementById("tema").value.trim();
+  if (!input) { alert("Ingresá el tema del carrusel"); return; }
+  const tema = input.length > 80 || input.includes("\n")
+    ? (input.split("\n")[0].slice(0, 60) || "carrusel")
+    : input;
 
   const config = {
     tema,
