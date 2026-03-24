@@ -26,7 +26,7 @@ ${estiloAnalizado}`
   // ── 2. Especificaciones de marca ─────────────────────────────────────────
   const brandBlock = `
 MANDATORY BRAND SPECIFICATIONS — apply these exactly, no exceptions:
-- BACKGROUND: replicate exactly the background from the style reference above (color, texture, gradient, or image treatment — whatever the reference uses). Do NOT use a plain white background unless the reference has one.
+- BACKGROUND: create a NEW original background inspired by the style reference — same treatment (blurred photo, texture, gradient, solid color, etc.) but a completely different image. Never copy or reuse the exact background from the reference. If the reference has a blurred editorial photo, generate a NEW blurred editorial photo in the same mood. If it has a texture, generate a similar texture but original.
 - Primary text color: ${config.paleta?.[0] || "#000000"}
 - Accent color 1: ${config.paleta?.[1] || "#888888"}
 - Accent color 2: ${config.paleta?.[2] || "#AAAAAA"}
