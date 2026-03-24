@@ -788,6 +788,18 @@
       </div>
     </div>
 
+    <!-- Aviso de tiempo -->
+    <div id="aviso-tiempo" style="display:none; background:#FFF8E7; border:1.5px solid #F59E0B; border-radius:12px; padding:16px 20px; display:none; align-items:flex-start; gap:12px">
+      <span style="font-size:22px;flex-shrink:0">⏱️</span>
+      <div>
+        <div style="font-family:'Raleway',sans-serif; font-weight:800; font-size:14px; color:#92400E; margin-bottom:4px">ATENCIÓN — Tiempo de generación</div>
+        <div style="font-size:12px; color:#78350F; line-height:1.6">
+          En marzo 2026, Nano Banana tarda en promedio <strong>2 minutos por imagen</strong>. Con 5 slides son aproximadamente <strong>10 minutos en total</strong>.<br>
+          La pantalla no se tildó — el proceso está corriendo. Podés hacer otra cosa mientras tanto, <strong>pero no cerrés esta pestaña</strong>.
+        </div>
+      </div>
+    </div>
+
     <!-- Progreso -->
     <div class="card progress-card" id="progress-card">
       <div class="card-body">
@@ -1108,6 +1120,7 @@ function generate(slidesOverride = null) {
   // Reset UI
   document.getElementById("preview-card").style.display   = "none";
   document.getElementById("empty-state").style.display    = "none";
+  document.getElementById("aviso-tiempo").style.display   = "flex";
   document.getElementById("progress-card").classList.add("visible");
   document.getElementById("slides-output").style.display  = "none";
   document.getElementById("caption-output").style.display = "none";
@@ -1186,6 +1199,7 @@ function generate(slidesOverride = null) {
     }
     else if (d.type === "done") {
       log("✅ ¡Carrusel listo!", "ok");
+      document.getElementById("aviso-tiempo").style.display = "none";
       setProgress(totalSlides, totalSlides);
       setBtnPreview(false);
       if (btnGenImg) { btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
