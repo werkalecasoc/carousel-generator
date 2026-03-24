@@ -807,10 +807,10 @@
     </div>
 
     <!-- Descargar ZIP -->
-    <a class="btn-download" id="btn-download" download>
+    <button class="btn-download" id="btn-download" onclick="downloadZip()">
       <span>⬇</span>
       <span>Descargar carrusel completo (.zip)</span>
-    </a>
+    </button>
 
     <!-- Caption -->
     <div class="card caption-output" id="caption-output">
@@ -1166,7 +1166,7 @@ function generate(slidesOverride = null) {
       setBtnPreview(false);
       if (btnGenImg) { btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
       const btnDown = document.getElementById("btn-download");
-      btnDown.href = `/api/download?dir=${encodeURIComponent(d.outputDir)}`;
+      btnDown.dataset.dir = d.outputDir;
       btnDown.classList.add("visible");
       es.close();
     }
@@ -1185,6 +1185,15 @@ function generate(slidesOverride = null) {
     if (btnGenImg) { btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
     es.close();
   };
+}
+
+// ─── Download ZIP ─────────────────────────────────────────────────────────────
+
+function downloadZip() {
+  const btn = document.getElementById("btn-download");
+  const dir = btn.dataset.dir;
+  if (!dir) return;
+  window.location.href = `/api/download?dir=${encodeURIComponent(dir)}`;
 }
 
 // ─── Caption ─────────────────────────────────────────────────────────────────
