@@ -199,6 +199,20 @@ app.post("/api/preview-slides", async (req, res) => {
   }
 });
 
+// ─── API: preparar generación (recibe config por POST, devuelve token) ──────
+
+const pendingConfigs = new Map();
+
+app.post("/api/prepare-generate", (req, res) => {
+  const config = req.body;
+  if (!config) return res.status(400).json({ error: "Falta config" });
+  const token = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  pendingConfigs.set(token, config);
+  // Limpiar token luego de 10 min por si no se usa
+  setTimeout(() => pendingConfigs.delete(token), 10 * 60 * 1000);
+  res.json({ token });
+});
+
 // ─── API: generar carrusel (SSE) ─────────────────────────────────────────────
 
 app.get("/api/generate", async (req, res) => {
@@ -212,7 +226,15 @@ app.get("/api/generate", async (req, res) => {
   };
 
   try {
-    const config = JSON.parse(decodeURIComponent(req.query.config));
+    // Soporte token (nuevo) y config directo en URL (legacy)
+    let config;
+    if (req.query.token) {
+      config = pendingConfigs.get(req.query.token);
+      pendingConfigs.delete(req.query.token);
+      if (!config) throw new Error("Token inválido o expirado");
+    } else {
+      config = JSON.parse(decodeURIComponent(req.query.config));
+    }
 
     // Validaciones básicas
     if (!process.env.GEMINI_API_KEY) throw new Error("Falta GEMINI_API_KEY en el archivo .env");

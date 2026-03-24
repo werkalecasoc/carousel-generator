@@ -257,6 +257,26 @@
   .slide-item textarea { min-height: 50px; resize: vertical; }
   .slide-item .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 
+  /* Modo lectura durante generación */
+  #preview-slides-list.locked .slide-item input,
+  #preview-slides-list.locked .slide-item textarea,
+  #preview-slides-list.locked .slide-item select {
+    pointer-events: none;
+    background: var(--bg-soft);
+    border-color: transparent;
+    color: var(--text);
+    cursor: default;
+    resize: none;
+  }
+  #preview-slides-list.locked .slide-item { background: var(--bg-soft); }
+  .preview-locked-badge {
+    display: none;
+    font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--text-light); background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 20px; padding: 3px 10px;
+  }
+  #preview-slides-list.locked ~ .preview-locked-badge { display: inline-block; }
+
   .btn-add-slide {
     width: 100%;
     background: none;
@@ -1033,7 +1053,7 @@ function setBtnPreview(loading) {
     : "<span>Ver contenido propuesto</span><span>→</span>";
 }
 
-function generate(slidesOverride = null) {
+async function generate(slidesOverride = null) {
   const tema = document.getElementById("tema").value.trim();
   if (!tema) { alert("Ingresá el tema del carrusel"); return; }
 
@@ -1055,8 +1075,13 @@ function generate(slidesOverride = null) {
     config.cantidadSlides = slides.length;
   }
 
-  // Reset UI
-  document.getElementById("preview-card").style.display   = "none";
+  // Reset UI — mantener preview-card visible pero en modo lectura
+  const previewCard = document.getElementById("preview-card");
+  if (previewCard.style.display !== "none") {
+    document.getElementById("preview-slides-list").classList.add("locked");
+    document.getElementById("btn-generate-images").style.display = "none";
+    previewCard.querySelector(".card-header p").textContent = "Contenido del carrusel (solo lectura)";
+  }
   document.getElementById("empty-state").style.display    = "none";
   document.getElementById("aviso-tiempo").style.display   = "flex";
   document.getElementById("progress-card").classList.add("visible");
@@ -1078,7 +1103,16 @@ function generate(slidesOverride = null) {
   const slideDataMap = {};
   if (slides && slides.length) slides.forEach(s => { slideDataMap[String(s.numero).padStart(2, "0")] = s; });
 
-  const es = new EventSource(`/api/generate?config=${encodeURIComponent(JSON.stringify(config))}`);
+  // Enviar config por POST para evitar límite de URL y errores de encoding
+  const prepRes = await fetch("/api/prepare-generate", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(config),
+  });
+  const { token, error: prepError } = await prepRes.json();
+  if (prepError) { send("error", { msg: prepError }); return; }
+
+  const es = new EventSource(`/api/generate?token=${token}`);
 
   es.onmessage = (e) => {
     const d = JSON.parse(e.data);
@@ -1156,7 +1190,9 @@ function generate(slidesOverride = null) {
       document.getElementById("aviso-tiempo").style.display = "none";
       setProgress(totalSlides, totalSlides);
       setBtnPreview(false);
-      if (btnGenImg) { btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
+      // Unlock preview card and show generate button again
+      document.getElementById("preview-slides-list").classList.remove("locked");
+      if (btnGenImg) { btnGenImg.style.display = ""; btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
       const btnDown = document.getElementById("btn-download");
       btnDown.dataset.dir = d.outputDir;
       btnDown.classList.add("visible");
@@ -1170,7 +1206,8 @@ function generate(slidesOverride = null) {
     else if (d.type === "error") {
       log("❌ " + d.msg, "err");
       setBtnPreview(false);
-      if (btnGenImg) { btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
+      document.getElementById("preview-slides-list").classList.remove("locked");
+      if (btnGenImg) { btnGenImg.style.display = ""; btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
       setStep(1);
       es.close();
     }
