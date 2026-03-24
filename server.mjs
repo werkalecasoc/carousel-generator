@@ -92,6 +92,28 @@ app.get("/api/refs/status", (req, res) => {
   res.json({ portada, interior });
 });
 
+// ─── API: diagnóstico de estilos ─────────────────────────────────────────────
+
+app.get("/api/debug/styles", (req, res) => {
+  const portadaPath  = path.join(__dirname, "refs/portada.png");
+  const interiorPath = path.join(__dirname, "refs/interior.png");
+  res.json({
+    cloudinaryConfigured: !!process.env.CLOUDINARY_CLOUD_NAME,
+    portada: {
+      fileExists: fs.existsSync(portadaPath),
+      fileSize:   fs.existsSync(portadaPath) ? fs.statSync(portadaPath).size : null,
+      styleCacheLoaded: !!styleCache.portada,
+      stylePreview: styleCache.portada ? styleCache.portada.slice(0, 150) : null,
+    },
+    interior: {
+      fileExists: fs.existsSync(interiorPath),
+      fileSize:   fs.existsSync(interiorPath) ? fs.statSync(interiorPath).size : null,
+      styleCacheLoaded: !!styleCache.interior,
+      stylePreview: styleCache.interior ? styleCache.interior.slice(0, 150) : null,
+    },
+  });
+});
+
 // ─── Helper: parsear contenido libre → slides JSON ───────────────────────────
 
 async function parsearContenido(contenido) {

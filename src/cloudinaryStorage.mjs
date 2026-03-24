@@ -1,6 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import https from "https";
 
 function configure() {
   if (!process.env.CLOUDINARY_CLOUD_NAME) return false;
@@ -15,18 +14,22 @@ function configure() {
 /** Sube una imagen de referencia a Cloudinary (sobreescribe si ya existe) */
 export async function uploadRef(localPath, type) {
   if (!configure()) return;
-  await cloudinary.uploader.upload(localPath, {
+  const result = await cloudinary.uploader.upload(localPath, {
     public_id:     `carousel-refs/${type}`,
     overwrite:     true,
     resource_type: "image",
     format:        "png",
   });
-  console.log(`☁️  Ref "${type}" guardada en Cloudinary`);
+  console.log(`☁️  Ref "${type}" guardada en Cloudinary: ${result.secure_url}`);
+  return result;
 }
 
-/** Descarga las refs desde Cloudinary al disco local (si existen) */
+/** Descarga las refs desde Cloudinary al disco local */
 export async function downloadRefs(portadaPath, interiorPath) {
-  if (!configure()) return;
+  if (!configure()) {
+    console.warn("⚠️  Cloudinary no configurado — se usan refs locales");
+    return;
+  }
   await Promise.all([
     downloadIfExists("carousel-refs/portada",  portadaPath),
     downloadIfExists("carousel-refs/interior", interiorPath),
@@ -36,19 +39,20 @@ export async function downloadRefs(portadaPath, interiorPath) {
 async function downloadIfExists(publicId, destPath) {
   try {
     const result = await cloudinary.api.resource(publicId, { resource_type: "image" });
-    await downloadFile(result.secure_url, destPath);
-    console.log(`⬇️  Descargada ref "${publicId}" desde Cloudinary`);
-  } catch {
-    // No existe todavía en Cloudinary, se saltea
+    const url = result.secure_url;
+    console.log(`⬇️  Descargando "${publicId}" desde: ${url}`);
+    await downloadFile(url, destPath);
+    const size = fs.statSync(destPath).size;
+    console.log(`✅ "${publicId}" guardada en disco (${size} bytes)`);
+  } catch (err) {
+    console.error(`❌ Error descargando "${publicId}": ${err.message}`);
   }
 }
 
-function downloadFile(url, destPath) {
-  return new Promise((resolve, reject) => {
-    const file = fs.createWriteStream(destPath);
-    https.get(url, (res) => {
-      res.pipe(file);
-      file.on("finish", () => { file.close(); resolve(); });
-    }).on("error", reject);
-  });
+/** Usa fetch nativo (Node 18+) que maneja redirects automáticamente */
+async function downloadFile(url, destPath) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP ${res.status} al descargar ${url}`);
+  const buffer = await res.arrayBuffer();
+  fs.writeFileSync(destPath, Buffer.from(buffer));
 }
