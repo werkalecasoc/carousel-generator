@@ -16,13 +16,24 @@ If any person appears in the image (model, subject, portrait, background figure)
 This rule overrides any reference image. Do NOT generate people with dark or medium-brown skin tones.
 `.trim();
 
-export function buildPrompt(slide, config) {
+export function buildPrompt(slide, config, estiloAnalizado = null) {
   const base = slide.tipo === "portada" || slide.layout === "portada"
     ? buildPortadaPrompt(slide, config)
     : buildInteriorPrompt(slide, config);
 
-  // Siempre se agrega al final, sin importar el layout o la referencia
-  return `${base}\n\n${PEOPLE_RULE}`;
+  // Bloque de estilo analizado de la imagen de referencia
+  const estiloBlock = estiloAnalizado ? `
+REFERENCE STYLE ANALYSIS (extracted from the uploaded reference image — apply this style exactly):
+${estiloAnalizado}
+
+IMPORTANT: Adapt the above style to use these specific brand colors and fonts:
+- Colors: ${config.paleta?.join(", ")}
+- Title font: ${config.tipografiaTitulos}
+- Body font: ${config.tipografiaSubtitulos}
+The composition, mood, lighting and layout must match the reference style. Colors and typography must match the brand config.
+`.trim() : "";
+
+  return [base, estiloBlock, PEOPLE_RULE].filter(Boolean).join("\n\n");
 }
 
 // ─── PORTADA ─────────────────────────────────────────────────────────────────

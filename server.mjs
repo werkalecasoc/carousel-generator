@@ -8,6 +8,7 @@ import { generateCopy } from "./src/generateCopy.mjs";
 import { buildPrompt } from "./src/buildPrompt.mjs";
 import { generateSlide } from "./src/generateSlide.mjs";
 import { generateInstagramCopy } from "./src/generateInstagramCopy.mjs";
+import { analyzeStyle } from "./src/analyzeStyle.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -28,12 +29,36 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/output", express.static(path.join(__dirname, "output")));
 app.use("/refs", express.static(path.join(__dirname, "refs")));
 
+// Cache de estilos analizados (se actualiza al subir nueva imagen)
+const styleCache = { portada: null, interior: null };
+
+// Al arrancar, analizar imágenes existentes si las hay
+async function preloadStyles() {
+  const portadaPath  = path.join(__dirname, "refs/portada.png");
+  const interiorPath = path.join(__dirname, "refs/interior.png");
+  if (fs.existsSync(portadaPath))  styleCache.portada  = await analyzeStyle(portadaPath,  "portada").catch(() => null);
+  if (fs.existsSync(interiorPath)) styleCache.interior = await analyzeStyle(interiorPath, "interior").catch(() => null);
+  if (styleCache.portada)  console.log("✅ Estilo portada analizado");
+  if (styleCache.interior) console.log("✅ Estilo interior analizado");
+}
+
 // ─── API: subir imágenes de referencia ──────────────────────────────────────
 
 app.post("/api/refs", upload.fields([
   { name: "portada", maxCount: 1 },
   { name: "interior", maxCount: 1 },
-]), (req, res) => {
+]), async (req, res) => {
+  // Analizar el estilo de cada imagen subida y actualizar el cache
+  if (req.files?.portada) {
+    console.log("🔍 Analizando estilo de portada...");
+    styleCache.portada  = await analyzeStyle(path.join(__dirname, "refs/portada.png"),  "portada").catch(() => null);
+    console.log("✅ Estilo portada actualizado");
+  }
+  if (req.files?.interior) {
+    console.log("🔍 Analizando estilo de interior...");
+    styleCache.interior = await analyzeStyle(path.join(__dirname, "refs/interior.png"), "interior").catch(() => null);
+    console.log("✅ Estilo interior actualizado");
+  }
   res.json({ ok: true });
 });
 
@@ -158,7 +183,8 @@ app.get("/api/generate", async (req, res) => {
       const filename = `slide-${slideNum}.png`;
       const outputPath = path.join(outputDir, filename);
       const styleImage = slide.tipo === "portada" ? config.estiloPortada : config.estiloInterior;
-      const prompt = buildPrompt(slide, config);
+      const estiloRef = slide.tipo === "portada" ? styleCache.portada : styleCache.interior;
+      const prompt = buildPrompt(slide, config, estiloRef);
 
       send("log", { msg: `  🖼️  Slide ${slideNum} (${slide.tipo}): "${slide.titulo}"` });
 
@@ -232,9 +258,9 @@ app.get("/api/download", async (req, res) => {
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`\n🍌 Carousel Generator corriendo en: http://localhost:${PORT}\n`);
-  // Abrir browser automáticamente
   import("child_process").then(({ exec }) => exec(`open http://localhost:${PORT}`));
   console.log(`(El puerto 3000 está ocupado por Remotion — usamos el 3001)\n`);
+  await preloadStyles();
 });
