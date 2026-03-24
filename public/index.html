@@ -12,16 +12,16 @@
 
   :root {
     --primary:    #1E293B;
-    --accent:     #3B6FE8;
-    --accent-h:   #2D5FD4;
+    --accent:     #cb6ce6;
+    --accent-h:   #b455d0;
     --success:    #22C55E;
     --danger:     #EF4444;
     --warn:       #F59E0B;
     --bg:         #FFFFFF;
-    --bg-soft:    #F7F9FC;
+    --bg-soft:    #FAF5FC;
     --bg-card:    #FFFFFF;
-    --border:     #E2E8F0;
-    --border-h:   #3B6FE8;
+    --border:     #E9D8F5;
+    --border-h:   #cb6ce6;
     --text:       #1E293B;
     --text-soft:  #64748B;
     --text-light: #94A3B8;
@@ -30,6 +30,7 @@
     --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
     --shadow:     0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
     --shadow-lg:  0 10px 30px rgba(0,0,0,.1), 0 4px 10px rgba(0,0,0,.06);
+    --accent-soft: #F5E8FD;
   }
 
   body {
@@ -52,7 +53,7 @@
   }
   .page-hero .badge {
     display: inline-block;
-    background: #EEF2FF;
+    background: var(--accent-soft);
     color: var(--accent);
     font-size: 11px;
     font-weight: 600;
@@ -140,27 +141,30 @@
   }
   .card-header {
     padding: 16px 20px 14px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 2px solid var(--accent-soft);
+    background: linear-gradient(135deg, var(--accent-soft) 0%, #ffffff 100%);
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
   }
   .card-header .icon {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    background: #EEF2FF;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--accent);
     display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
+    font-size: 16px;
+    box-shadow: 0 2px 8px rgba(203,108,230,.3);
   }
   .card-header h3 {
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 800;
     color: var(--primary);
+    letter-spacing: -.01em;
   }
   .card-header p {
     font-size: 11px;
-    color: var(--text-light);
-    margin-top: 1px;
+    color: var(--text-soft);
+    margin-top: 2px;
   }
   .card-body { padding: 20px; }
 
@@ -269,9 +273,9 @@
   /* ── PARSE BUTTON ── */
   .btn-parse {
     width: 100%;
-    background: #EEF2FF;
+    background: var(--accent-soft);
     color: var(--accent);
-    border: 1.5px solid #C7D7FD;
+    border: 1.5px solid #dda8f5;
     border-radius: 8px;
     padding: 10px;
     font-size: 12px;
@@ -357,7 +361,7 @@
     display: flex; align-items: center; justify-content: center; gap: 8px;
     margin-top: 8px;
   }
-  .btn-generate:hover { background: var(--accent); box-shadow: 0 6px 16px rgba(59,111,232,.3); }
+  .btn-generate:hover { background: var(--accent-h); box-shadow: 0 6px 16px rgba(203,108,230,.35); }
   .btn-generate:active { transform: scale(.98); }
   .btn-generate:disabled { background: var(--text-light); box-shadow: none; cursor: not-allowed; }
 
@@ -395,7 +399,7 @@
   }
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), #7C3AED);
+    background: linear-gradient(90deg, var(--accent), #7C3AED, var(--accent));
     border-radius: 100px;
     width: 0%;
     transition: width .5s ease;
@@ -941,7 +945,6 @@ async function previewContent() {
       tono:           document.getElementById("tono").value,
       audiencia:      document.getElementById("audiencia").value,
       contenido:      document.getElementById("contenido-libre").value.trim() || null,
-      slides:         getSlides() || null,
     };
 
     const res = await fetch("/api/preview-slides", {
