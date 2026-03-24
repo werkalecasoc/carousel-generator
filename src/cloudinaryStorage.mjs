@@ -17,6 +17,7 @@ export async function uploadRef(localPath, type) {
   const result = await cloudinary.uploader.upload(localPath, {
     public_id:     `carousel-refs/${type}`,
     overwrite:     true,
+    invalidate:    true,
     resource_type: "image",
     format:        "png",
   });
