@@ -650,9 +650,15 @@
           </div>
         </div>
 
-        <div class="field">
-          <label>Audiencia</label>
-          <input type="text" id="audiencia" placeholder="ej: dueños de inmobiliarias">
+        <div class="row-2">
+          <div class="field">
+            <label>Audiencia</label>
+            <input type="text" id="audiencia" placeholder="ej: dueños de inmobiliarias">
+          </div>
+          <div class="field">
+            <label>Marca (opcional)</label>
+            <input type="text" id="marca" placeholder="ej: Werkalec">
+          </div>
         </div>
 
         <!-- Pegar contenido libre -->
@@ -1078,6 +1084,7 @@ function generate(slidesOverride = null) {
     tipografiaSubtitulos: document.getElementById("tipografiaSubtitulos").value,
     paleta:               getPaleta(),
     modelo:               document.getElementById("modelo").value,
+    marca:                document.getElementById("marca").value.trim() || null,
   };
 
   const slides = slidesOverride;

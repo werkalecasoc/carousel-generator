@@ -67,7 +67,7 @@ CTA PILL — bottom center:
   Small white pill/rounded rectangle containing only a "→" arrow. No other text.
 
 BRAND TAG — top center:
-  Text "Werkalec" in small elegant lettering, white, centered at top
+  ${config.marca ? `Text "${config.marca}" in small elegant lettering, white, centered at top` : "No brand tag."}
 
 Rules: no borders, no gradients added artificially, no watermarks.
 The photograph IS the background.
@@ -104,8 +104,8 @@ function buildInteriorPrompt(slide, config) {
 
 // ─── LAYOUTS INTERIORES ──────────────────────────────────────────────────────
 
-const brandTag = (textColor) =>
-  `BRAND TAG top center: text "Werkalec" in small elegant lettering, color: ${textColor}, centered at the top`;
+const brandTag = (textColor, marca) =>
+  marca ? `BRAND TAG top center: text "${marca}" in small elegant lettering, color: ${textColor}, centered at the top` : "";
 
 const ctaPill = () =>
   `CTA PILL bottom right: small white rounded rectangle (pill shape), containing only a single arrow "→", dark color inside. No other text.`;
@@ -124,7 +124,7 @@ Create an interior carousel slide (4:5 portrait, 1080x1350px). Premium editorial
 
 BACKGROUND: solid warm light tone (${c.bg}), clean and airy.
 
-BRAND TAG top center: small 2–3 line all-caps bold label in ${c.text}.
+${brandTag(c.text, config.marca)}
 
 LAYOUT — two-zone vertical split: MITO on top, VERDAD below:
 
@@ -161,7 +161,7 @@ Create an interior carousel slide (4:5 portrait, 1080x1350px). Match the referen
 
 BACKGROUND: solid warm cream (${c.bg}), clean, airy, no texture.
 
-${brandTag(c.text)}
+${brandTag(c.text, config.marca)}
 
 LAYOUT — top half: typography, bottom half: image card
 - TOP: Title "${slide.titulo}" — ${tipografiaTitulos}, very large (60–80pt), ${c.text}, left-aligned, upper 35% of slide
@@ -185,7 +185,7 @@ Create an interior carousel slide (4:5 portrait, 1080x1350px). Match the referen
 
 BACKGROUND: solid warm cream (${c.bg}), airy.
 
-${brandTag(c.text)}
+${brandTag(c.text, config.marca)}
 
 LAYOUT — two column images below the title:
 - TOP: Title "${slide.titulo}" — ${tipografiaTitulos}, large (50–70pt), ${c.text}, left-aligned
@@ -210,7 +210,7 @@ Create an interior carousel slide (4:5 portrait, 1080x1350px). Match the referen
 
 BACKGROUND: solid warm cream (${c.bg}), airy.
 
-${brandTag(c.text)}
+${brandTag(c.text, config.marca)}
 
 LAYOUT — title top, large product/object centered with breathing room:
 - TOP LEFT: Title "${slide.titulo}" — ${tipografiaTitulos}, large (55–75pt), ${c.text}
@@ -235,7 +235,7 @@ Create an interior carousel slide (4:5 portrait, 1080x1350px). Match the referen
 
 BACKGROUND: solid warm cream (${c.bg}).
 
-${brandTag(c.text)}
+${brandTag(c.text, config.marca)}
 
 LAYOUT — dark card as hero + small accent image:
 - MAIN ELEMENT: Large dark rounded rectangle card (color ${darkCard}, border-radius ~20px, ~80% width, ~55% height)
@@ -261,7 +261,7 @@ Create an interior carousel slide (4:5 portrait, 1080x1350px). Match the referen
 
 BACKGROUND: solid warm cream (${c.bg}), airy.
 
-${brandTag(c.text)}
+${brandTag(c.text, config.marca)}
 
 LAYOUT — before/after comparison:
 - TOP: Title "${slide.titulo}" — ${tipografiaTitulos}, large (55–70pt), ${c.text}, left-aligned
@@ -287,7 +287,7 @@ Create an interior carousel slide (4:5 portrait, 1080x1350px). Match the referen
 
 BACKGROUND: solid warm cream (${c.bg}), airy.
 
-${brandTag(c.text)}
+${brandTag(c.text, config.marca)}
 
 LAYOUT — typography is the only hero, no photographs:
 - TITLE: "${slide.titulo}"
