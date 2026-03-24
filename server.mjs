@@ -46,10 +46,20 @@ async function preloadStyles() {
     await downloadRefs(portadaPath, interiorPath).catch(() => null);
   }
 
-  if (fs.existsSync(portadaPath))  styleCache.portada  = await analyzeStyle(portadaPath,  "portada").catch(() => null);
-  if (fs.existsSync(interiorPath)) styleCache.interior = await analyzeStyle(interiorPath, "interior").catch(() => null);
-  if (styleCache.portada)  console.log("✅ Estilo portada analizado");
-  if (styleCache.interior) console.log("✅ Estilo interior analizado");
+  if (fs.existsSync(portadaPath)) {
+    styleCache.portada = await analyzeStyle(portadaPath, "portada").catch((e) => { console.error("❌ analyzeStyle portada:", e.message); return null; });
+    if (styleCache.portada) console.log("✅ Estilo portada analizado:", styleCache.portada.slice(0, 80) + "...");
+    else console.warn("⚠️  Estilo portada: análisis falló o devolvió null");
+  } else {
+    console.warn("⚠️  refs/portada.png no existe en disco");
+  }
+  if (fs.existsSync(interiorPath)) {
+    styleCache.interior = await analyzeStyle(interiorPath, "interior").catch((e) => { console.error("❌ analyzeStyle interior:", e.message); return null; });
+    if (styleCache.interior) console.log("✅ Estilo interior analizado:", styleCache.interior.slice(0, 80) + "...");
+    else console.warn("⚠️  Estilo interior: análisis falló o devolvió null");
+  } else {
+    console.warn("⚠️  refs/interior.png no existe en disco");
+  }
 }
 
 // ─── API: subir imágenes de referencia ──────────────────────────────────────
@@ -84,17 +94,13 @@ app.get("/api/refs/status", (req, res) => {
   res.json({ portada, interior });
 });
 
-// ─── API: parsear contenido libre en slides ──────────────────────────────────
+// ─── Helper: parsear contenido libre → slides JSON ───────────────────────────
 
-app.post("/api/parse-slides", async (req, res) => {
-  try {
-    const { contenido, cantidadSlides } = req.body;
-    if (!contenido) return res.status(400).json({ error: "Falta el contenido" });
+async function parsearContenido(contenido) {
+  const { GoogleGenAI } = await import("@google/genai");
+  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-    const { GoogleGenAI } = await import("@google/genai");
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
-    const prompt = `Sos un experto en carruseles de Instagram. El usuario te da el contenido de su carrusel en texto libre.
+  const prompt = `Sos un experto en carruseles de Instagram. El usuario te da el contenido de su carrusel en texto libre.
 Tu tarea es estructurarlo en slides con el formato JSON indicado.
 
 CONTENIDO DEL USUARIO:
@@ -125,16 +131,49 @@ Respondé ÚNICAMENTE con JSON válido sin markdown:
   ]
 }`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+  });
 
-    const raw = response.candidates[0].content.parts[0].text.trim()
-      .replace(/^```json\n?/, "").replace(/\n?```$/, "").trim();
+  const raw = response.candidates[0].content.parts[0].text.trim()
+    .replace(/^```json\n?/, "").replace(/\n?```$/, "").trim();
 
-    const data = JSON.parse(raw);
+  return JSON.parse(raw);
+}
+
+// ─── API: parsear contenido libre en slides ──────────────────────────────────
+
+app.post("/api/parse-slides", async (req, res) => {
+  try {
+    const { contenido } = req.body;
+    if (!contenido) return res.status(400).json({ error: "Falta el contenido" });
+    const data = await parsearContenido(contenido);
     res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─── API: previsualizar slides (sin generar imágenes) ────────────────────────
+
+app.post("/api/preview-slides", async (req, res) => {
+  try {
+    const { tema, cantidadSlides, tono, audiencia, contenido, slides } = req.body;
+
+    // Si ya hay slides definidos, devolverlos tal cual
+    if (slides && slides.length > 0) return res.json({ slides });
+
+    // Si hay contenido libre, parsearlo
+    if (contenido) {
+      const data = await parsearContenido(contenido);
+      return res.json(data);
+    }
+
+    // Generar copy desde cero con el tema
+    if (!tema) return res.status(400).json({ error: "Falta el tema" });
+    const generatedSlides = await generateCopy({ tema, cantidadSlides, tono, audiencia });
+    res.json({ slides: generatedSlides });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -203,13 +242,17 @@ app.get("/api/generate", async (req, res) => {
       send("log", { msg: `  🖼️  Slide ${slideNum} (${slide.tipo}): "${slide.titulo}"` });
 
       try {
-        await generateSlide(prompt, styleImage, outputPath, config.modelo);
+        await generateWithRetry(prompt, styleImage, outputPath, config.modelo,
+          async (attempt, max, waitSecs) => {
+            send("log", { msg: `     ⚠️ Servidor ocupado, reintentando en ${waitSecs}s... (${attempt}/${max})` });
+          }
+        );
         const publicPath = `/output/carrusel-${slug}-${fecha}/${filename}`;
         send("slide", { slideNum, path: publicPath, titulo: slide.titulo });
         send("log", { msg: `     ✅ Listo` });
         results.push({ slide: slide.numero, path: outputPath, status: "ok" });
       } catch (err) {
-        send("log", { msg: `     ❌ Error: ${err.message}` });
+        send("log", { msg: `     ❌ Error en slide ${slideNum}: ${err.message}` });
         results.push({ slide: slide.numero, status: "error", error: err.message });
       }
 
@@ -271,6 +314,25 @@ app.get("/api/download", async (req, res) => {
 // ─── Start ───────────────────────────────────────────────────────────────────
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Reintenta generateSlide en errores 503 / alta demanda
+async function generateWithRetry(prompt, styleImage, outputPath, modelo, onRetry, maxRetries = 5) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      await generateSlide(prompt, styleImage, outputPath, modelo);
+      return;
+    } catch (err) {
+      const isTemp = /503|UNAVAILABLE|high demand|overloaded|temporarily/i.test(err.message);
+      if (isTemp && attempt < maxRetries) {
+        const waitSecs = attempt * 6;
+        await onRetry(attempt, maxRetries, waitSecs);
+        await sleep(waitSecs * 1000);
+      } else {
+        throw err;
+      }
+    }
+  }
+}
 
 app.listen(PORT, async () => {
   console.log(`\n🍌 Carousel Generator corriendo en: http://localhost:${PORT}\n`);

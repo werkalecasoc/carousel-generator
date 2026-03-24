@@ -412,9 +412,10 @@
     line-height: 1.8;
     color: var(--text-soft);
   }
-  .log-scroll .log-ok  { color: var(--success); }
-  .log-scroll .log-err { color: var(--danger); }
-  .log-scroll .log-dim { color: var(--text-light); }
+  .log-scroll .log-ok   { color: var(--success); }
+  .log-scroll .log-err  { color: var(--danger); }
+  .log-scroll .log-warn { color: var(--warn); }
+  .log-scroll .log-dim  { color: var(--text-light); }
 
   /* ── SLIDES GRID ── */
   .slides-output { display: none; }
@@ -732,9 +733,9 @@
       </div>
     </div>
 
-    <!-- Botón generar -->
-    <button class="btn-generate" id="btn-generate" onclick="generate()">
-      <span>Generar carrusel</span>
+    <!-- Botón ver contenido -->
+    <button class="btn-generate" id="btn-preview" onclick="previewContent()">
+      <span>Ver contenido propuesto</span>
       <span>→</span>
     </button>
 
@@ -747,7 +748,25 @@
     <div class="empty-state" id="empty-state">
       <div class="empty-icon">✦</div>
       <h3>Tu carrusel aparecerá acá</h3>
-      <p>Completá el formulario y hacé clic en "Generar carrusel"</p>
+      <p>Completá el formulario y hacé clic en "Ver contenido propuesto"</p>
+    </div>
+
+    <!-- Preview de contenido (paso intermedio) -->
+    <div class="card" id="preview-card" style="display:none">
+      <div class="card-header">
+        <div class="icon">📋</div>
+        <div>
+          <h3>Contenido propuesto</h3>
+          <p>Revisá y editá cada slide antes de generar las imágenes</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="preview-slides-list" style="max-height:60vh;overflow-y:auto;padding-right:4px"></div>
+        <button class="btn-generate" id="btn-generate-images" onclick="generateFromPreview()" style="margin-top:16px">
+          <span>Generar imágenes</span>
+          <span>→</span>
+        </button>
+      </div>
     </div>
 
     <!-- Progreso -->
@@ -942,7 +961,97 @@ async function parseContenido() {
   btn.disabled = false;
 }
 
-// ─── Generar ─────────────────────────────────────────────────────────────────
+// ─── Previsualizar contenido ──────────────────────────────────────────────────
+
+async function previewContent() {
+  const tema = document.getElementById("tema").value.trim();
+  if (!tema) { alert("Ingresá el tema del carrusel"); return; }
+
+  const btn = document.getElementById("btn-preview");
+  btn.disabled = true;
+  btn.innerHTML = "<span>Generando contenido...</span><span>⏳</span>";
+
+  try {
+    const body = {
+      tema,
+      cantidadSlides: parseInt(document.getElementById("cantidadSlides").value) || 7,
+      tono:           document.getElementById("tono").value,
+      audiencia:      document.getElementById("audiencia").value,
+      contenido:      document.getElementById("contenido-libre").value.trim() || null,
+      slides:         getSlides() || null,
+    };
+
+    const res = await fetch("/api/preview-slides", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    renderPreview(data.slides);
+    document.getElementById("empty-state").style.display = "none";
+    document.getElementById("preview-card").style.display = "block";
+    setStep(2);
+  } catch (err) {
+    alert("Error al generar contenido: " + err.message);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = "<span>Ver contenido propuesto</span><span>→</span>";
+}
+
+function escapeAttr(str) {
+  return (str || "").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+function renderPreview(slides) {
+  const list = document.getElementById("preview-slides-list");
+  list.innerHTML = "";
+  slides.forEach((s, i) => {
+    const layoutOpts = LAYOUTS.map(l =>
+      `<option value="${l}" ${s.layout===l?"selected":""}>${l}</option>`
+    ).join("");
+    const div = document.createElement("div");
+    div.className = "slide-item";
+    div.dataset.numero    = s.numero || (i + 1);
+    div.dataset.ctaTexto  = s.ctaTexto || "→";
+    div.innerHTML = `
+      <div class="slide-header">
+        <span class="slide-label">Slide ${i+1}</span>
+      </div>
+      <div class="row-2">
+        <select class="prev-tipo">
+          <option value="contenido" ${s.tipo==="contenido"?"selected":""}>contenido</option>
+          <option value="portada"   ${s.tipo==="portada"?"selected":""}>portada</option>
+          <option value="cta"       ${s.tipo==="cta"?"selected":""}>cta</option>
+        </select>
+        <select class="prev-layout">${layoutOpts}</select>
+      </div>
+      <input  type="text" class="prev-titulo"    placeholder="Título"              value="${escapeAttr(s.titulo)}">
+      <input  type="text" class="prev-subtitulo" placeholder="Subtítulo (opcional)" value="${escapeAttr(s.subtitulo)}">
+      <textarea           class="prev-texto"     placeholder="Texto (opcional)">${s.texto||""}</textarea>`;
+    list.appendChild(div);
+  });
+}
+
+function getPreviewSlides() {
+  return Array.from(document.querySelectorAll("#preview-slides-list .slide-item")).map((item, i) => ({
+    numero:    parseInt(item.dataset.numero) || (i + 1),
+    tipo:      item.querySelector(".prev-tipo").value,
+    layout:    item.querySelector(".prev-layout").value,
+    titulo:    item.querySelector(".prev-titulo").value,
+    subtitulo: item.querySelector(".prev-subtitulo").value || null,
+    texto:     item.querySelector(".prev-texto").value     || null,
+    ctaTexto:  item.dataset.ctaTexto || "→",
+  }));
+}
+
+function generateFromPreview() {
+  generate(getPreviewSlides());
+}
+
+// ─── Generar imágenes ─────────────────────────────────────────────────────────
 
 let totalSlides = 0, doneSlides = 0;
 
@@ -969,7 +1078,15 @@ function setStep(n) {
   });
 }
 
-function generate() {
+function setBtnPreview(loading) {
+  const btn = document.getElementById("btn-preview");
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? "<span>Generando...</span>"
+    : "<span>Ver contenido propuesto</span><span>→</span>";
+}
+
+function generate(slidesOverride = null) {
   const tema = document.getElementById("tema").value.trim();
   if (!tema) { alert("Ingresá el tema del carrusel"); return; }
 
@@ -984,13 +1101,14 @@ function generate() {
     modelo:               document.getElementById("modelo").value,
   };
 
-  const slides = getSlides();
+  const slides = slidesOverride || getSlides();
   if (slides && slides.length) {
     config.slides = slides;
     config.cantidadSlides = slides.length;
   }
 
   // Reset UI
+  document.getElementById("preview-card").style.display   = "none";
   document.getElementById("empty-state").style.display    = "none";
   document.getElementById("progress-card").classList.add("visible");
   document.getElementById("slides-output").style.display  = "none";
@@ -998,9 +1116,10 @@ function generate() {
   document.getElementById("slides-grid").innerHTML        = "";
   document.getElementById("log-box").innerHTML            = "";
   document.getElementById("caption-text").innerHTML       = '<button class="btn-copy" onclick="copyCaption()">Copiar</button>';
-  document.getElementById("btn-generate").disabled        = true;
-  document.getElementById("btn-generate").innerHTML       = '<span>Generando...</span>';
-  document.getElementById("slides-count").textContent     = "0 slides";
+  const btnGenImg = document.getElementById("btn-generate-images");
+  if (btnGenImg) { btnGenImg.disabled = true; btnGenImg.innerHTML = "<span>Generando...</span>"; }
+  setBtnPreview(true);
+  document.getElementById("slides-count").textContent = "0 slides";
   setProgress(0, 0);
   setStep(4);
   totalSlides = 0; doneSlides = 0;
@@ -1011,7 +1130,8 @@ function generate() {
     const d = JSON.parse(e.data);
 
     if (d.type === "log") {
-      log(d.msg, d.msg.includes("✅") ? "ok" : d.msg.includes("❌") ? "err" : "");
+      const cls = d.msg.includes("✅") ? "ok" : d.msg.includes("❌") ? "err" : d.msg.includes("⚠️") ? "warn" : "";
+      log(d.msg, cls);
     }
     else if (d.type === "total") {
       totalSlides = d.total;
@@ -1021,7 +1141,6 @@ function generate() {
       document.getElementById("slides-output").style.display = "block";
       document.getElementById("slides-count").textContent    = `${doneSlides} slides`;
       setProgress(doneSlides, totalSlides);
-
       const card = document.createElement("div");
       card.className = "slide-card";
       card.onclick = () => openLightbox(d.path);
@@ -1039,9 +1158,8 @@ function generate() {
     else if (d.type === "done") {
       log("✅ ¡Carrusel listo!", "ok");
       setProgress(totalSlides, totalSlides);
-      document.getElementById("btn-generate").disabled = false;
-      document.getElementById("btn-generate").innerHTML = "<span>Generar carrusel</span><span>→</span>";
-      // Activar botón de descarga
+      setBtnPreview(false);
+      if (btnGenImg) { btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
       const btnDown = document.getElementById("btn-download");
       btnDown.href = `/api/download?dir=${encodeURIComponent(d.outputDir)}`;
       btnDown.classList.add("visible");
@@ -1049,8 +1167,8 @@ function generate() {
     }
     else if (d.type === "error") {
       log("❌ " + d.msg, "err");
-      document.getElementById("btn-generate").disabled = false;
-      document.getElementById("btn-generate").innerHTML = "<span>Generar carrusel</span><span>→</span>";
+      setBtnPreview(false);
+      if (btnGenImg) { btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
       setStep(1);
       es.close();
     }
@@ -1058,8 +1176,8 @@ function generate() {
 
   es.onerror = () => {
     log("❌ Se perdió la conexión con el servidor", "err");
-    document.getElementById("btn-generate").disabled = false;
-    document.getElementById("btn-generate").innerHTML = "<span>Generar carrusel</span><span>→</span>";
+    setBtnPreview(false);
+    if (btnGenImg) { btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
     es.close();
   };
 }
