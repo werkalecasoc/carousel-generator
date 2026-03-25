@@ -20,7 +20,7 @@ export async function generateSlide(prompt, styleImagePath, outputPath, model = 
 This image is provided as a VISUAL STYLE GUIDE ONLY.
 DO NOT copy, reproduce, or reuse any of the following from this image:
 - Specific objects, products, or subjects shown
-- People, faces, or bodies
+- People, faces, or bodies — NEVER reproduce any person from this reference image. If the reference contains people, extract only the lighting, color treatment, and aesthetic mood, then generate entirely new AI-created people or no people at all.
 - Any text, logos, or brand elements
 - The exact composition or scene
 
