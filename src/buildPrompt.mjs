@@ -27,9 +27,11 @@ ${estiloAnalizado}`
   const brandBlock = `
 MANDATORY BRAND SPECIFICATIONS — apply these exactly, no exceptions:
 - BACKGROUND: create a NEW original background inspired by the style reference — same treatment (blurred photo, texture, gradient, solid color, etc.) but a completely different image. Never copy or reuse the exact background from the reference. If the reference has a blurred editorial photo, generate a NEW blurred editorial photo in the same mood. If it has a texture, generate a similar texture but original.
-- Primary text color: ${config.paleta?.[0] || "#000000"}
-- Accent color 1: ${config.paleta?.[1] || "#888888"}
-- Accent color 2: ${config.paleta?.[2] || "#AAAAAA"}
+- TEXT COLOR — MANDATORY: ALL text, titles, subtitles, labels, and body copy MUST use ONLY the exact brand colors below. Do NOT use colors extracted from the reference image for text.
+- Primary text color: ${config.paleta?.[0] || "#000000"} — use this for ALL main text and titles
+- Accent color 1: ${config.paleta?.[1] || "#888888"} — use this for highlights, pills, labels, decorative elements
+- Accent color 2: ${config.paleta?.[2] || "#AAAAAA"} — use this for secondary text and details
+- IMPORTANT: ignore any colors seen in the reference image for text/typography. The ONLY colors allowed for text and UI elements are the three brand colors listed above.
 - Title font: ${config.tipografiaTitulos} — use this exact typeface for all titles
 - Body font: ${config.tipografiaSubtitulos} — use this exact typeface for body text
 ${config.marca ? `- Brand name: "${config.marca}" — small elegant text, top center of slide` : "- No brand tag"}`.trim();
@@ -39,7 +41,12 @@ ${config.marca ? `- Brand name: "${config.marca}" — small elegant text, top ce
     ? buildPortadaContent(slide, config)
     : buildInteriorContent(slide, config);
 
-  return [styleBlock, brandBlock, contentBlock, PEOPLE_RULE].join("\n\n");
+  const textRule = `EXACT TEXT RULE — CRITICAL:
+All text shown in quotes below is FINAL and APPROVED. Reproduce it CHARACTER BY CHARACTER as written.
+DO NOT rephrase, summarize, translate, shorten, expand, or "improve" any text in quotes.
+DO NOT add extra words, taglines, slogans, hashtags, or any text not explicitly listed below.`;
+
+  return [styleBlock, brandBlock, textRule, contentBlock, PEOPLE_RULE].join("\n\n");
 }
 
 // ─── PORTADA ──────────────────────────────────────────────────────────────────
