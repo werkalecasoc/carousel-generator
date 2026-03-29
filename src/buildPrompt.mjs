@@ -44,7 +44,8 @@ ${config.marca ? `- Brand name: "${config.marca}" — small elegant text, top ce
   const textRule = `EXACT TEXT RULE — CRITICAL:
 All text shown in quotes below is FINAL and APPROVED. Reproduce it CHARACTER BY CHARACTER as written.
 DO NOT rephrase, summarize, translate, shorten, expand, or "improve" any text in quotes.
-DO NOT add extra words, taglines, slogans, hashtags, or any text not explicitly listed below.`;
+DO NOT add extra words, taglines, slogans, hashtags, or any text not explicitly listed below.
+DO NOT add, remove, or change any punctuation marks (no extra "?", "!", ".", "...", "¿", "¡" or any other symbol unless it appears in the approved text).`;
 
   return [styleBlock, brandBlock, textRule, contentBlock, PEOPLE_RULE].join("\n\n");
 }
