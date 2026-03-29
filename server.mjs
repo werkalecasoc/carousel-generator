@@ -116,22 +116,24 @@ app.get("/api/debug/styles", (req, res) => {
 
 // ─── Helper: parsear contenido libre → slides JSON ───────────────────────────
 
-async function parsearContenido(contenido) {
+async function parsearContenido(contenido, cantidadSlides = 7) {
   const { GoogleGenAI } = await import("@google/genai");
   const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
   const prompt = `Sos un experto en carruseles de Instagram. El usuario te da el contenido de su carrusel en texto libre.
-Tu tarea es estructurarlo en slides con el formato JSON indicado.
+Tu tarea es estructurarlo en EXACTAMENTE ${cantidadSlides} slides con el formato JSON indicado.
 
 CONTENIDO DEL USUARIO:
 ${contenido}
 
 LAYOUTS disponibles: "portada", "mito-verdad", "texto-imagen", "texto-dos-columnas", "texto-producto", "card-oscura", "antes-despues", "solo-tipografia"
 
-Reglas:
-- El primer slide siempre es tipo "portada" con layout "portada"
-- El último slide es tipo "cta"
-- Los del medio son tipo "contenido" — elegí el layout más apropiado según el contenido
+REGLAS OBLIGATORIAS:
+- Generá EXACTAMENTE ${cantidadSlides} slides. Ni más, ni menos.
+- El slide 1 siempre es tipo "portada" con layout "portada"
+- El slide ${cantidadSlides} es tipo "cta"
+- Los slides del medio son tipo "contenido" — elegí el layout más apropiado
+- Si el contenido es corto, expandilo: desarrollá cada punto en más detalle, agregá contexto, ejemplos, tips o datos relacionados para completar los ${cantidadSlides} slides
 - "titulo": máx 8 palabras, impactante
 - "subtitulo": la idea clave del slide, máx 12 palabras
 - "texto": desarrollo o dato concreto, máx 20 palabras (puede ser null)
@@ -186,7 +188,7 @@ app.post("/api/preview-slides", async (req, res) => {
 
     // Si hay contenido libre, parsearlo
     if (contenido) {
-      const data = await parsearContenido(contenido);
+      const data = await parsearContenido(contenido, cantidadSlides || 7);
       return res.json(data);
     }
 
@@ -262,6 +264,12 @@ app.get("/api/generate", async (req, res) => {
     } else {
       send("log", { msg: "📝 Generando copy con Gemini..." });
       slides = await generateCopy(config);
+      // Validar que el modelo respetó la cantidad pedida
+      const pedidos = parseInt(config.cantidadSlides) || 7;
+      if (slides.length !== pedidos) {
+        send("log", { msg: `⚠️ El modelo generó ${slides.length} slides (se pedían ${pedidos}). Reintentando...` });
+        slides = await generateCopy(config);
+      }
       fs.writeFileSync(path.join(outputDir, "contenido.json"), JSON.stringify({ slides }, null, 2));
       send("log", { msg: `✅ Copy generado: ${slides.length} slides` });
     }

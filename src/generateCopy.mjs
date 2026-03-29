@@ -11,62 +11,36 @@ export async function generateCopy(config) {
 
   const prompt = `Sos un experto en contenido para redes sociales argentinas, especialmente carruseles de Instagram. Usás el voseo (vos, tenés, podés, sabés) y un tono profesional pero cercano, típico del español rioplatense.
 
-Genera el contenido para un carrusel de ${cantidadSlides} slides sobre el tema: "${tema}".
+Generá el contenido para un carrusel de EXACTAMENTE ${cantidadSlides} slides sobre el tema: "${tema}".
 
 Parámetros:
 - Tono: ${tono}
 - Audiencia: ${audiencia}
-- Fuente de títulos: ${tipografiaTitulos}
-- Fuente de subtítulos: ${tipografiaSubtitulos}
 
-REGLAS DE CONTENIDO:
-- Slide 1: PORTADA — título impactante + subtítulo breve que genere curiosidad.
-- Último slide: CTA — mensaje de cierre + acción concreta.
-- Slides del medio: contenido clave, una idea por slide.
+REGLA FUNDAMENTAL — CANTIDAD DE SLIDES:
+Debés generar EXACTAMENTE ${cantidadSlides} slides. Ni uno más, ni uno menos.
+Si el tema parece corto, expandilo: desarmalo en subtemas, agregá ejemplos concretos, tips, datos, errores comunes, beneficios, pasos, preguntas frecuentes — lo que sea necesario para completar los ${cantidadSlides} slides con contenido valioso.
 
-REGLAS DE LAYOUT — para cada slide elige el layout más adecuado:
+ESTRUCTURA OBLIGATORIA:
+- Slide 1: PORTADA — título impactante + subtítulo que genere curiosidad
+- Slides 2 a ${cantidadSlides - 1}: contenido clave, una idea por slide, variando layouts
+- Slide ${cantidadSlides}: CTA — mensaje de cierre + acción concreta
 
-"portada" → solo para el slide 1, foto full-bleed con texto encima.
+LAYOUTS disponibles para slides interiores:
+- "texto-imagen": título grande arriba + imagen ilustrativa abajo
+- "texto-dos-columnas": título arriba + dos imágenes lado a lado (comparaciones)
+- "texto-producto": título arriba a la izquierda + objeto grande centrado
+- "card-oscura": concepto clave en card oscura con texto blanco
+- "antes-despues": comparación visual con flecha (transformación)
+- "solo-tipografia": tipografía dominante, sin imagen, para frases de impacto
+- "mito-verdad": mito arriba tachado + verdad abajo en negrita
 
-Para slides interiores, elige uno de estos layouts:
-- "texto-imagen": título grande arriba + imagen ilustrativa abajo en card redondeada
-- "texto-dos-columnas": título arriba + dos imágenes lado a lado (para comparaciones o ejemplos)
-- "texto-producto": título arriba a la izquierda + producto/objeto grande centrado respira en el fondo
-- "card-oscura": concepto clave en card oscura redondeada con texto blanco + pequeña imagen accent
-- "antes-despues": texto arriba + comparación visual con flecha (para mostrar transformación)
-- "solo-tipografia": slide dominado por tipografía grande, sin imagen, para frases de impacto
-
-Responde ÚNICAMENTE con un JSON válido sin markdown ni explicaciones:
+Respondé ÚNICAMENTE con JSON válido sin markdown ni explicaciones. El array "slides" debe tener EXACTAMENTE ${cantidadSlides} elementos:
 {
   "slides": [
-    {
-      "numero": 1,
-      "tipo": "portada",
-      "layout": "portada",
-      "titulo": "...",
-      "subtitulo": "...",
-      "texto": null,
-      "ctaTexto": "SWIPE →"
-    },
-    {
-      "numero": 2,
-      "tipo": "contenido",
-      "layout": "texto-imagen",
-      "titulo": "...",
-      "subtitulo": "...",
-      "texto": "...",
-      "ctaTexto": "SWIPE →"
-    },
-    ...
-    {
-      "numero": ${cantidadSlides},
-      "tipo": "cta",
-      "layout": "texto-producto",
-      "titulo": "...",
-      "subtitulo": "...",
-      "texto": "...",
-      "ctaTexto": "GUARDAR →"
-    }
+    { "numero": 1, "tipo": "portada", "layout": "portada", "titulo": "...", "subtitulo": "...", "texto": null, "ctaTexto": "SWIPE →" },
+    { "numero": 2, "tipo": "contenido", "layout": "texto-imagen", "titulo": "...", "subtitulo": "...", "texto": "...", "ctaTexto": "SWIPE →" },
+    { "numero": ${cantidadSlides}, "tipo": "cta", "layout": "texto-producto", "titulo": "...", "subtitulo": "...", "texto": "...", "ctaTexto": "GUARDAR →" }
   ]
 }`;
 
