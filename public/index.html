@@ -534,10 +534,11 @@
     <div class="card">
       <div class="card-header">
         <div class="icon">🖼️</div>
-        <div>
+        <div style="flex:1">
           <h3>Imágenes de referencia de estilo</h3>
           <p>Portada + interior — si no cambiás, se reusan las anteriores</p>
         </div>
+        <button onclick="clearOutputCache()" style="flex-shrink:0;background:none;border:1.5px solid var(--border);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--text-soft);cursor:pointer;font-family:'Lato',sans-serif;white-space:nowrap;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-soft)'" title="Borra todas las carpetas generadas en /output">🗑️ Limpiar caché</button>
       </div>
       <div class="card-body">
         <div class="refs-grid">
@@ -1191,6 +1192,19 @@ function openLightbox(src) {
 }
 function closeLightbox() {
   document.getElementById("lightbox").classList.remove("open");
+}
+
+// ─── Clear output cache ───────────────────────────────────────────────────────
+
+async function clearOutputCache() {
+  if (!confirm("¿Borrar todas las generaciones anteriores?\nEsto elimina todas las imágenes del output. No se puede deshacer.")) return;
+  const res  = await fetch("/api/clear-output", { method: "DELETE" });
+  const data = await res.json();
+  if (data.ok) {
+    alert(`✅ Caché limpiado — ${data.deleted} carpeta(s) eliminada(s).`);
+  } else {
+    alert("❌ Error al limpiar el caché.");
+  }
 }
 
 // ─── Init ────────────────────────────────────────────────────────────────────

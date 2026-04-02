@@ -15,24 +15,35 @@ export async function generateSlide(prompt, styleImagePath, outputPath, model = 
   const styleImageBase64 = styleImageBytes.toString("base64");
   const styleMimeType    = getMimeType(styleImagePath);
 
-  const styleInstruction = `STYLE REFERENCE IMAGE — read carefully before generating.
+  const styleInstruction = `⚠️ VISUAL MOOD BOARD — READ THIS BEFORE GENERATING ANYTHING.
 
-This image is provided as a VISUAL STYLE GUIDE ONLY.
-DO NOT copy, reproduce, or reuse any of the following from this image:
-- Specific objects, products, or subjects shown
-- People, faces, or bodies — NEVER reproduce any person from this reference image. If the reference contains people, extract only the lighting, color treatment, and aesthetic mood, then generate entirely new AI-created people or no people at all.
-- Any text, logos, or brand elements
-- The exact composition or scene
+This image is a STYLE REFERENCE ONLY — a mood board to extract aesthetic language.
+You MUST NOT copy, reproduce, reuse, or derive ANY visual element from this image.
 
-ONLY extract and apply these style attributes:
-- Color treatment (warm/cool, saturated/muted, contrast level)
-- Background style (flat, gradient, textured, photographic)
-- Typography treatment (bold/light mix, shadow, outline, sizing hierarchy)
-- Lighting mood (bright/dark, soft/harsh, studio/natural)
-- Decorative elements style (geometric shapes, lines, pills, overlays)
-- Overall aesthetic (editorial, minimal, playful, corporate, premium)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STRICTLY FORBIDDEN — do NOT reproduce from this reference:
+• Any object, product, subject, or scene shown in this image
+• Any person, face, body, or silhouette — even in a stylized or abstract form
+• Any text, logo, icon, or typographic element visible in this image
+• The exact color palette, background, or composition of this image
+• Any graphic element, illustration, shape, or decorative detail from this image
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Now CREATE A COMPLETELY ORIGINAL image using those style attributes, following these instructions:
+WHAT YOU MUST DO INSTEAD:
+Look at this image and extract ONLY its visual DNA — the aesthetic language:
+• Is it a photo? → Generate a BRAND NEW photo in the same photographic style (same lighting mood, same editorial treatment, same color grading — but a completely different subject and scene)
+• Is it an illustration or drawing? → Generate a BRAND NEW illustration with the same drawing style, line weight, and graphic language — but with entirely new content
+• Is it 3D render? → Generate a new 3D render in the same render style — different scene
+• Background treatment (flat color, gradient, textured, blurred photo, etc.)
+• Typography visual mood (bold/light hierarchy, shadows, outlines, sizing)
+• Lighting and shadows (soft studio, harsh dramatic, natural, etc.)
+• Decorative elements style (geometric, organic, minimal, ornate)
+• Overall aesthetic mood (editorial, corporate, playful, premium, raw)
+
+The result MUST be a 100% original creation that has NEVER existed before.
+It should feel visually coherent with the reference style — but share ZERO actual content.
+
+Now generate a completely original image following these specifications:
 
 ${prompt}`;
 

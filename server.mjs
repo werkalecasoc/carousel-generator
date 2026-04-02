@@ -329,6 +329,25 @@ app.get("/api/generate", async (req, res) => {
   res.end();
 });
 
+// ─── API: limpiar caché (borrar carpetas de output generadas) ────────────────
+
+app.delete("/api/clear-output", (req, res) => {
+  const outputDir = path.join(__dirname, "output");
+  if (!fs.existsSync(outputDir)) return res.json({ ok: true, deleted: 0 });
+
+  const entries = fs.readdirSync(outputDir);
+  let deleted = 0;
+  for (const entry of entries) {
+    const entryPath = path.join(outputDir, entry);
+    if (fs.statSync(entryPath).isDirectory()) {
+      fs.rmSync(entryPath, { recursive: true, force: true });
+      deleted++;
+    }
+  }
+  console.log(`🗑️  Caché limpiado: ${deleted} carpeta(s) eliminada(s)`);
+  res.json({ ok: true, deleted });
+});
+
 // ─── API: descargar ZIP con imágenes + caption ───────────────────────────────
 
 app.get("/api/download", async (req, res) => {

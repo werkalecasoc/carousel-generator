@@ -17,10 +17,13 @@ export function buildPrompt(slide, config, estiloAnalizado = null) {
 
   // ── 1. Bloque de estilo ──────────────────────────────────────────────────
   const styleBlock = estiloAnalizado
-    ? `GENERATE A COMPLETELY NEW IMAGE. Do NOT copy any existing image. Use the following style as your visual guide:
+    ? `⚠️ CRITICAL — READ BEFORE GENERATING:
+You are creating a BRAND NEW original image. The reference image is a mood board — its purpose is ONLY to communicate the aesthetic style. You MUST NOT reproduce, copy, or derive any visual content from it.
 
-VISUAL STYLE (from reference — apply this aesthetic exactly):
-${estiloAnalizado}`
+AESTHETIC STYLE GUIDE (extracted from reference — use ONLY as visual language, not as content to copy):
+${estiloAnalizado}
+
+MANDATE: Generate a 100% original image that has NEVER existed before. It must feel stylistically coherent with the above description, but share ZERO actual content with the reference image. Every element — people, objects, backgrounds, scenes — must be completely new.`
     : `GENERATE A NEW INSTAGRAM CAROUSEL SLIDE (4:5 portrait, 1080x1350px).`;
 
   // ── 2. Especificaciones de marca ─────────────────────────────────────────
