@@ -6,35 +6,35 @@
 <title>Generador de Carruseles IA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --primary:    #1E293B;
-    --accent:     #cb6ce6;
-    --accent-h:   #b455d0;
+    --primary:    #1A1A1A;
+    --accent:     #F27A1A;
+    --accent-h:   #D96A10;
     --success:    #22C55E;
     --danger:     #EF4444;
     --warn:       #F59E0B;
     --bg:         #FFFFFF;
-    --bg-soft:    #FAF5FC;
+    --bg-soft:    #F5F5F5;
     --bg-card:    #FFFFFF;
-    --border:     #E9D8F5;
-    --border-h:   #cb6ce6;
-    --text:       #1E293B;
-    --text-soft:  #64748B;
-    --text-light: #94A3B8;
+    --border:     #E0E0E0;
+    --border-h:   #F27A1A;
+    --text:       #1A1A1A;
+    --text-soft:  #555555;
+    --text-light: #999999;
     --radius:     12px;
     --radius-pill: 50px;
     --shadow-sm:  0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
     --shadow:     0 4px 12px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04);
     --shadow-lg:  0 10px 30px rgba(0,0,0,.1), 0 4px 10px rgba(0,0,0,.06);
-    --accent-soft: #F5E8FD;
+    --accent-soft: #FFF3E8;
   }
 
   body {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Poppins', sans-serif;
     background: var(--bg-soft);
     color: var(--text);
     font-size: 14px;
@@ -42,7 +42,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, h4, .heading { font-family: 'Lato', sans-serif; }
+  h1, h2, h3, h4, .heading { font-family: 'Nunito Sans', sans-serif; font-weight: 700; }
 
 
   /* ── LAYOUT ── */
@@ -69,30 +69,26 @@
     overflow: hidden;
   }
   .card-header {
-    padding: 16px 20px 14px;
-    border-bottom: 2px solid var(--accent-soft);
-    background: linear-gradient(135deg, var(--accent-soft) 0%, #ffffff 100%);
+    padding: 14px 20px;
+    border-bottom: none;
+    background: #1A1A1A;
     display: flex;
     align-items: center;
     gap: 12px;
   }
   .card-header .icon {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    background: var(--accent);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px;
-    box-shadow: 0 2px 8px rgba(203,108,230,.3);
+    display: none;
   }
   .card-header h3 {
-    font-size: 14px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 20px;
     font-weight: 800;
-    color: var(--primary);
+    color: #FFFFFF;
     letter-spacing: -.01em;
   }
   .card-header p {
     font-size: 11px;
-    color: var(--text-soft);
+    color: #BBBBBB;
     margin-top: 2px;
   }
   .card-body { padding: 20px; }
@@ -123,7 +119,7 @@
     border-radius: 8px;
     padding: 9px 12px;
     font-size: 13px;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Poppins', sans-serif;
     color: var(--text);
     background: var(--bg);
     outline: none;
@@ -131,7 +127,7 @@
   }
   .field input:focus, .field textarea:focus, .field select:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(59,111,232,.1);
+    box-shadow: 0 0 0 3px rgba(242,122,26,.12);
   }
   .field textarea { resize: vertical; min-height: 90px; }
   .field select { cursor: pointer; }
@@ -150,7 +146,7 @@
     min-height: 90px;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
   }
-  .ref-slot:hover { border-color: var(--accent); background: #F5F8FF; }
+  .ref-slot:hover { border-color: var(--accent); background: var(--accent-soft); }
   .ref-slot.has-image { border-style: solid; border-color: var(--success); background: #F0FDF4; }
   .ref-slot input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .ref-slot img { width: 100%; height: 70px; object-fit: cover; border-radius: 6px; margin-bottom: 4px; }
@@ -173,7 +169,7 @@
     border-radius: 8px;
     padding: 8px 10px;
     font-size: 12px;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Poppins', sans-serif;
     color: var(--text);
     outline: none;
   }
@@ -231,7 +227,7 @@
     border-radius: 6px;
     padding: 7px 10px;
     font-size: 12px;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Poppins', sans-serif;
     color: var(--text);
     outline: none;
     transition: border-color .15s;
@@ -271,7 +267,7 @@
     font-size: 12px;
     color: var(--text-light);
     cursor: pointer;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Poppins', sans-serif;
     transition: border-color .15s, color .15s;
     margin-top: 4px;
   }
@@ -281,21 +277,22 @@
   .btn-generate {
     width: 100%;
     background: var(--primary);
-    color: white;
-    border: none;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+    background: #1A1A1A;
     border-radius: var(--radius-pill);
     padding: 14px 24px;
     font-size: 14px;
     font-weight: 700;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Poppins', sans-serif;
     letter-spacing: .02em;
     cursor: pointer;
-    transition: background .2s, transform .1s, box-shadow .2s;
-    box-shadow: 0 4px 12px rgba(30,41,59,.2);
+    transition: background .2s, transform .1s, box-shadow .2s, color .2s;
+    box-shadow: none;
     display: flex; align-items: center; justify-content: center; gap: 8px;
     margin-top: 8px;
   }
-  .btn-generate:hover { background: var(--accent-h); box-shadow: 0 6px 16px rgba(203,108,230,.35); }
+  .btn-generate:hover { background: var(--accent); color: white; box-shadow: 0 6px 16px rgba(242,122,26,.35); }
   .btn-generate:active { transform: scale(.98); }
   .btn-generate:disabled { background: var(--text-light); box-shadow: none; cursor: not-allowed; }
 
@@ -333,7 +330,7 @@
   }
   .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--accent), #7C3AED, var(--accent));
+    background: linear-gradient(90deg, var(--accent), #FF9A3C, var(--accent));
     border-radius: 100px;
     width: 0%;
     transition: width .5s ease;
@@ -432,7 +429,7 @@
     padding: 2px 7px;
     border-radius: 100px;
     backdrop-filter: blur(4px);
-    border: 1px solid rgba(59,111,232,.2);
+    border: 1px solid rgba(242,122,26,.2);
   }
 
   /* ── CAPTION ── */
@@ -453,40 +450,40 @@
   .btn-copy {
     position: absolute;
     top: 12px; right: 12px;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
+    background: none;
+    border: 1.5px solid var(--accent);
     border-radius: var(--radius-pill);
     padding: 5px 14px;
     font-size: 11px;
     font-weight: 600;
-    font-family: 'Lato', sans-serif;
-    color: var(--text-soft);
+    font-family: 'Poppins', sans-serif;
+    color: var(--accent);
     cursor: pointer;
-    transition: border-color .15s, color .15s;
+    transition: background .15s, color .15s;
   }
-  .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-copy:hover { background: var(--accent); color: white; }
 
   /* ── DOWNLOAD ── */
   .btn-download {
     display: none;
     width: 100%;
     align-items: center; justify-content: center; gap: 10px;
-    background: var(--success);
-    color: white;
-    border: none;
+    background: transparent;
+    color: var(--accent);
+    border: 2px solid var(--accent);
     border-radius: var(--radius-pill);
     padding: 14px 24px;
     font-size: 14px;
     font-weight: 700;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Poppins', sans-serif;
     letter-spacing: .02em;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(34,197,94,.25);
-    transition: background .2s, transform .1s, box-shadow .2s;
+    box-shadow: none;
+    transition: background .2s, transform .1s, box-shadow .2s, color .2s;
     text-decoration: none;
   }
   .btn-download.visible { display: flex; }
-  .btn-download:hover { background: #16A34A; box-shadow: 0 6px 16px rgba(34,197,94,.35); }
+  .btn-download:hover { background: var(--accent); color: white; box-shadow: 0 6px 16px rgba(242,122,26,.35); }
   .btn-download:active { transform: scale(.98); }
 
   /* ── LIGHTBOX ── */
@@ -518,7 +515,48 @@
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
   @keyframes spin { to { transform: rotate(360deg); } }
-  .btn-generate.loading { background: var(--text-light); cursor: not-allowed; }
+  .btn-generate.loading { background: var(--text-light); color: white; border-color: var(--text-light); cursor: not-allowed; }
+
+  /* ── ERROR BANNER ── */
+  .error-banner {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2000;
+    background: #1A1A1A;
+    color: #FFFFFF;
+    border-left: 4px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px 48px 16px 20px;
+    max-width: 560px;
+    width: 90%;
+    box-shadow: var(--shadow-lg);
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    animation: slideDown .3s ease;
+  }
+  .error-banner strong {
+    display: block;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    color: var(--accent);
+  }
+  .error-banner .close-banner {
+    position: absolute;
+    top: 10px; right: 14px;
+    background: none; border: none;
+    color: #999; font-size: 18px;
+    cursor: pointer;
+  }
+  .error-banner .close-banner:hover { color: #FFF; }
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
 </style>
 </head>
 <body>
@@ -538,7 +576,7 @@
           <h3>Imágenes de referencia de estilo</h3>
           <p>Portada + interior — si no cambiás, se reusan las anteriores</p>
         </div>
-        <button onclick="clearOutputCache()" style="flex-shrink:0;background:none;border:1.5px solid var(--border);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--text-soft);cursor:pointer;font-family:'Lato',sans-serif;white-space:nowrap;transition:border-color .15s,color .15s" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-soft)'" title="Borra todas las carpetas generadas en /output">🗑️ Limpiar caché</button>
+        <button onclick="clearOutputCache()" style="flex-shrink:0;background:none;border:1.5px solid var(--accent);border-radius:8px;padding:5px 10px;font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;transition:background .15s,color .15s" onmouseover="this.style.background='var(--accent)';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='var(--accent)'" title="Borra todas las carpetas generadas en /output">Limpiar caché</button>
       </div>
       <div class="card-body">
         <div class="refs-grid">
@@ -716,11 +754,10 @@
     </div>
 
     <!-- Aviso de tiempo -->
-    <div id="aviso-tiempo" style="display:none; background:#FFF8E7; border:1.5px solid #F59E0B; border-radius:12px; padding:16px 20px; display:none; align-items:flex-start; gap:12px">
-      <span style="font-size:22px;flex-shrink:0">⏱️</span>
+    <div id="aviso-tiempo" style="display:none; background:#1A1A1A; border:1.5px solid #333; border-radius:12px; padding:16px 20px; display:none; align-items:flex-start; gap:12px">
       <div>
-        <div style="font-family:'Lato',sans-serif; font-weight:800; font-size:14px; color:#92400E; margin-bottom:4px">ATENCIÓN — Tiempo de generación</div>
-        <div style="font-size:12px; color:#78350F; line-height:1.6">
+        <div style="font-family:'Nunito Sans',sans-serif; font-weight:800; font-size:14px; color:#F27A1A; margin-bottom:4px">ATENCIÓN — Tiempo de generación</div>
+        <div style="font-size:12px; color:#CCCCCC; line-height:1.6">
           En marzo 2026, Nano Banana tarda en promedio <strong>2 minutos por imagen</strong>. Con 5 slides son aproximadamente <strong>10 minutos en total</strong>.<br>
           La pantalla no se tildó — el proceso está corriendo. Podés hacer otra cosa mientras tanto, <strong>pero no cerrés esta pestaña</strong>.
         </div>
@@ -751,7 +788,7 @@
     </div>
 
     <!-- Reintentar fallidos -->
-    <button class="btn-generate" id="btn-retry" style="display:none;background:#F59E0B" onclick="retryFailed()">
+    <button class="btn-generate" id="btn-retry" style="display:none" onclick="retryFailed()">
       <span>Reintentar slides fallidos</span>
       <span id="failed-count-badge"></span>
     </button>
@@ -891,7 +928,11 @@ async function previewContent() {
     document.getElementById("preview-card").style.display = "block";
     setStep(2);
   } catch (err) {
-    alert("Error al generar contenido: " + err.message);
+    if (/503|UNAVAILABLE|high demand|overloaded/i.test(err.message)) {
+      showErrorBanner("El modelo de IA está saturado en este momento. Esperá unos minutos y volvé a intentar, o probá con otro modelo de generación.");
+    } else {
+      showErrorBanner("Error al generar contenido: " + err.message);
+    }
   }
 
   btn.disabled = false;
@@ -1140,6 +1181,11 @@ async function generate(slidesOverride = null) {
     }
     else if (d.type === "error") {
       log("❌ " + d.msg, "err");
+      if (/503|UNAVAILABLE|high demand|overloaded/i.test(d.msg)) {
+        showErrorBanner("El modelo de IA está saturado en este momento. Esperá unos minutos y volvé a intentar, o probá con otro modelo de generación.");
+      } else {
+        showErrorBanner("Error durante la generación: " + d.msg);
+      }
       setBtnPreview(false);
       document.getElementById("preview-slides-list").classList.remove("locked");
       if (btnGenImg) { btnGenImg.style.display = ""; btnGenImg.disabled = false; btnGenImg.innerHTML = "<span>Generar imágenes</span><span>→</span>"; }
@@ -1205,6 +1251,24 @@ async function clearOutputCache() {
   } else {
     alert("❌ Error al limpiar el caché.");
   }
+}
+
+// ─── Error banner ────────────────────────────────────────────────────────────
+
+function showErrorBanner(msg) {
+  // Remover banner anterior si existe
+  const prev = document.querySelector(".error-banner");
+  if (prev) prev.remove();
+
+  const banner = document.createElement("div");
+  banner.className = "error-banner";
+  banner.innerHTML = `
+    <button class="close-banner" onclick="this.parentElement.remove()">✕</button>
+    <strong>Error de servicio</strong>
+    ${msg}`;
+  document.body.appendChild(banner);
+  // Auto-cerrar después de 15 segundos
+  setTimeout(() => { if (banner.parentElement) banner.remove(); }, 15000);
 }
 
 // ─── Init ────────────────────────────────────────────────────────────────────
